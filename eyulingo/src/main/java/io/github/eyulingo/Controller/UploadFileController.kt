@@ -1,4 +1,4 @@
-package com.yue.bookie.server.lib.controller
+package io.github.eyulingo.Controller
 
 import com.mongodb.MongoClient
 import com.mongodb.MongoClientURI
@@ -6,7 +6,7 @@ import com.mongodb.MongoClientURI
 import com.mongodb.client.gridfs.GridFSBuckets
 import com.mongodb.client.gridfs.model.GridFSUploadOptions
 import com.mongodb.gridfs.GridFS
-import com.yue.bookie.server.lib.mongo.ImageManager
+import io.github.eyulingo.MongoDB.ImageManager
 import org.bson.Document
 import org.bson.types.ObjectId
 import org.springframework.beans.factory.annotation.Autowired
@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.multipart.MultipartFile
-import java.io.OutputStream
 import java.util.*
 import javax.servlet.http.HttpServletResponse
 import kotlin.collections.HashMap
@@ -33,7 +32,7 @@ class UploadFileController {
 
     var mongoClient = MongoClient(MongoClientURI(mongoDBUri))
 
-    var myDatabase = mongoClient.getDatabase("bookie_imgs")
+    var myDatabase = mongoClient.getDatabase("eyulingo_imgs")
 
     var gridFSBucket = GridFSBuckets.create(myDatabase)
 

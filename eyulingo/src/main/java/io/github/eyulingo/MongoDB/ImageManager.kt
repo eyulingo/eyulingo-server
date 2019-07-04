@@ -1,7 +1,6 @@
-package com.yue.bookie.server.lib.mongo
+package io.github.eyulingo.MongoDB
 import com.mongodb.*
 import org.bson.types.Binary
-import java.io.FileInputStream
 import java.util.*
 import org.springframework.core.io.ClassPathResource
 
@@ -25,7 +24,7 @@ object ImageManager {
     }
 
     fun uploadImage(fileName: String, content: Binary): String? {
-        val database = mongoClient.getDatabase("bookie_imgs")
+        val database = mongoClient.getDatabase("eyulingo_imgs")
         val covers = database.getCollection("covers")
 //        covers.
         val newFileName = UUID.randomUUID().toString()
@@ -33,7 +32,7 @@ object ImageManager {
     }
 
     fun getImage(fileName: String): Binary? {
-        val database = mongoClient.getDatabase("bookie_imgs")
+        val database = mongoClient.getDatabase("eyulingo_imgs")
         val covers = database.getCollection("covers")
         // Performing a read operation on the collection.
         return null

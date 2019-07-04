@@ -29,7 +29,6 @@ public class Stores implements Serializable {
     @Column(name = "end_time")
     private String endTime;
 
-    @Id
     @Column(name = "dist_name")
     private String distName;
 

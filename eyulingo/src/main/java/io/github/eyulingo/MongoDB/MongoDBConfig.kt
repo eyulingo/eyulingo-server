@@ -1,4 +1,5 @@
-package com.yue.bookie.server.lib.mongo
+package io.github.eyulingo.MongoDB
+
 
 import com.mongodb.Mongo
 import com.mongodb.MongoClient
@@ -7,8 +8,6 @@ import com.mongodb.gridfs.GridFS
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.ClassPathResource
-import java.io.File
-import java.io.FileInputStream
 import java.util.*
 
 
@@ -17,7 +16,7 @@ open class MongoDBConfig {
 
     @Bean
     open fun gridFS(): GridFS {
-        return GridFS(mongo().getDB("bookie_imgs"))
+        return GridFS(mongo().getDB("eyulingo_imgs"))
     }
 
     @Bean
