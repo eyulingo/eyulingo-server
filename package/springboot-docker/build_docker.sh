@@ -4,8 +4,8 @@ cd ../../eyulingo
 
 ./mvnw clean package -DskipTests
 
-mv target/demo-0.0.1-SNAPSHOT.jar ../dockerize/springboot-docker/app.jar
+mv target/eyulingo-0.0.1-SNAPSHOT.jar ../package/springboot-docker/app.jar
 
-cd ../dockerize/sb-docker
+cd ../package/springboot-docker
 
 docker build -t yuxiqian/eyulingo-server .

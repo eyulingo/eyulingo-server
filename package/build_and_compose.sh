@@ -7,13 +7,13 @@ cd sql-docker
 
 cd ../
 
-cd sb-docker
+cd springboot-docker
 ./build_docker.sh
 
 cd ../
 
-docker push yuxiqian/bookie-mysql
-docker push yuxiqian/bookie-server
+docker push yuxiqian/eyulingo-mysql
+docker push yuxiqian/eyulingo-server
 
 docker-compose up
 
