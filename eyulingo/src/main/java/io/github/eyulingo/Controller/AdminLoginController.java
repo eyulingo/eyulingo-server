@@ -13,7 +13,7 @@ public class AdminLoginController {
     private AdminService adminService;
 
 
-    @RequestMapping(value = "/admin/login",method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+    @RequestMapping(value = "/admin/login",method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     public
     @ResponseBody
     String adminLogin(@RequestBody JSONObject data){

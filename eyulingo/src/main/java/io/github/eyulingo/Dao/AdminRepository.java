@@ -7,9 +7,8 @@ import io.github.eyulingo.Entity.Admins;
 
 import java.util.List;
 
-@Repository("AdminRepository")
+@Repository
 public interface AdminRepository extends CrudRepository<Admins,String> {
     List<Admins> findByAdminName(String adminName);
-
-
+    List<Admins>  findAll();
 }
