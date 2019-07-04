@@ -1,1 +1,5 @@
 application.properties
+application.properties.disabled
+
+application_release.properties
+application_release.properties.disabled
