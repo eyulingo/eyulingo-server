@@ -5,4 +5,8 @@ echo "Starting eyulingo-android Unit Tests"
 # Put unit test code here
 # 
 
-echo "eyulingo-android Unit Tests complete!"
+./eyulingo/mvnw package
+
+./eyulingo/mvnw test
+
+echo "eyulingo-server Unit Tests complete!"
