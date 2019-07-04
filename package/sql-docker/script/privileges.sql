@@ -7,4 +7,5 @@ grant all on eyulingo_db.* to 'docker'@'%' identified by '123456docker' with gra
 grant all on eyulingo_db.* to 'docker'@'47.103.15.32' identified by '123456docker' with grant option;
 grant all on eyulingo_db.* to 'docker'@'localhost' identified by '123456docker' with grant option;
 
+
 flush privileges;
