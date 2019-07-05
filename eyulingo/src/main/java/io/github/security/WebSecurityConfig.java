@@ -12,8 +12,9 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
  * Security 主配置文件
  * @author Veiking
  */
+
 @Configuration
-@EnableWebSecurity //开启Spring Security的功能
+@EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	/**
@@ -21,7 +22,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	 */
 	@Override
 	public void configure(WebSecurity webSecurity) throws Exception {
-
 		webSecurity.ignoring().antMatchers("/store/**", "/admin/**");
 	}
 
@@ -32,9 +32,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
 		httpSecurity
 				.authorizeRequests().antMatchers("/store/**", "/admin/**","/img/download", "/img/upload", "/login", "/failure", "/ok").permitAll()
-				// 对于网站部分资源需要指定鉴权
-//             .antMatchers("/admin/**").hasRole("R_ADMIN")
-				// 除上面外的所有请求全部需要鉴权认证
 				.anyRequest().authenticated().and()
 				// 定义当需要用户登录时候，转到的登录页面
 				.formLogin().loginPage("/login")
@@ -47,6 +44,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		;
 		// 禁用缓存
 		httpSecurity.headers().cacheControl();
+	}
+
+	@Bean
+	public AuthenticationManager authenticationManagerBean() throws Exception {
+		// ALTOUGH THIS SEEMS LIKE USELESS CODE,
+		// ITS REQUIRED TO PREVENT SPRING BOOT AUTO-CONFIGURATION
+		return super.authenticationManagerBean();
 	}
 
 }

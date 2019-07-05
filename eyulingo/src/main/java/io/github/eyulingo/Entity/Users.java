@@ -1,12 +1,16 @@
 package io.github.eyulingo.Entity;
 
 
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Collection;
 
 @Entity
 @Table(name = "Users")
-public class Users  {
+public class Users extends User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "user_id")
@@ -24,12 +28,8 @@ public class Users  {
     @Column(name = "cover_id")
     private String imageId;
 
-    public Users(Users sUser) {
-        userId = sUser.userId;
-        userName = sUser.userName;
-        password = sUser.password;
-        userPhone = sUser.userPhone;
-        imageId = sUser.imageId;
+    public Users(String username, String password, Collection<? extends GrantedAuthority> authorities) {
+        super(username, password, authorities);
     }
 
     public void setUserId(Long userId) {
