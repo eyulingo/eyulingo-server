@@ -24,7 +24,12 @@ public class Users  {
     @Column(name = "cover_id")
     private String imageId;
 
-    public Users() {
+    public Users(Users sUser) {
+        userId = sUser.userId;
+        userName = sUser.userName;
+        password = sUser.password;
+        userPhone = sUser.userPhone;
+        imageId = sUser.imageId;
     }
 
     public void setUserId(Long userId) {
