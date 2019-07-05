@@ -27,66 +27,160 @@ public class AdminServiceImpl implements AdminService{
         try {
             List<Admins> adminsList = adminRepository.findByAdminName(data.getString("adminName"));
             if (adminsList.isEmpty()) {
-                return "adminName not exists";
+                return "{\"status\": \"adminName not exists\"}";
             }
             Admins admin = adminsList.get(0);
 
             if (admin.getAdminPassword().equals(data.getString("password"))) {
-                return "ok";
+                return "{\"status\": \"ok\"}";
             } else {
-                return "Incorrect password";
+                return "{\"status\": \"Incorrect password\"}";
             }
         } catch (Exception ex) {
-            return "internal_error";
+            ex.printStackTrace();
+            return "{\"status\": \"internal_error\"}";
         }
     }
 
     public JSONArray getAllStores(){
-        Iterable<Stores> Slist = storeRepository.findAll();
-        JSONArray res = new JSONArray();
-        for(Stores store:Slist){
-            JSONObject item = new JSONObject();
-            item.accumulate("store_id",store.getStoreId());
-            item.accumulate("name",store.getStoreName());
-            item.accumulate("address",store.getStoreAddress());
-            item.accumulate("starttime",store.getStartTime());
-            item.accumulate("endtime",store.getEndTime());
-            item.accumulate("store_image_id",store.getCoverId());
-            item.accumulate("location",store.getDistLocation());
-            item.accumulate("truename",store.getDistName());
-            item.accumulate("dist_phone_nu",store.getDistPhone());
-            item.accumulate("password",store.getDistPassword());
-            item.accumulate("dist_image_id",store.getDistImageId());
-            item.accumulate("store_phone_nu",store.getStorePhone());
+            Iterable<Stores> Slist = storeRepository.findAll();
+            JSONArray res = new JSONArray();
+            for (Stores store : Slist) {
+                JSONObject item = new JSONObject();
+                item.accumulate("store_id", store.getStoreId());
+                String name=store.getStoreName();
+                if(!name.isEmpty()){
+                    item.accumulate("name",name );
+                }
 
-            res.add(item);
+                String address=store.getStoreAddress();
+                if(!address.isEmpty()){
+                    item.accumulate("address",address);
+                }
+
+                String starttime = store.getStartTime();
+                if(!starttime.isEmpty()){
+                    item.accumulate("starttime", starttime);
+                }
+
+                String endtime = store.getEndTime();
+                if(!endtime.isEmpty()){
+                    item.accumulate("endtime", endtime);
+                }
+
+                String store_image_id = store.getCoverId();
+                if(!store_image_id.isEmpty()){
+                    item.accumulate("store_image_id",store_image_id);
+                }
+
+                String location = store.getDistLocation();
+                if(!location.isEmpty()){
+                    item.accumulate("location",location);
+                }
+
+                String truename = store.getDistName();
+                if(!truename.isEmpty()){
+                    item.accumulate("truename",truename);
+                }
+
+                String dist_phone_nu= store.getDistPhone();
+                if(!dist_phone_nu.isEmpty()){
+                    item.accumulate("dist_phone_nu",dist_phone_nu);
+                }
+
+                String password = store.getDistPassword();
+                if(!dist_phone_nu.isEmpty()){
+                    item.accumulate("password",password);
+                }
+
+                String dist_image_id =  store.getDistImageId();
+                if(!dist_image_id.isEmpty()){
+                    item.accumulate("dist_image_id", dist_image_id);
+                }
+
+                String store_phone_nu =  store.getStorePhone();
+                if (!store_phone_nu.isEmpty()) {
+                    item.accumulate("store_phone_nu", store_phone_nu);
+                }
+                res.add(item);
+            }
+            return res;
         }
-        return res;
+
+    public String modifyStores(JSONObject data){
+        try {
+            System.out.println(data);
+            Stores store = storeRepository.findByStoreId(data.getLong("store_id"));
+            String address = data.getString("address");
+            if(!address.isEmpty()){
+                store.setStoreName(address);
+            }
+            String name = data.getString("name");
+            if(!name.isEmpty()){
+                store.setStoreName(name);
+            }
+            String starttime = data.getString("starttime");
+            if(!starttime.isEmpty()){
+                store.setStoreName(starttime);
+            }
+            String endtime = data.getString("endtime");
+            if(!endtime.isEmpty()){
+                store.setStoreName(endtime);
+            }
+            String store_image_id = data.getString("store_image_id");
+            if(!store_image_id.isEmpty()){
+                store.setStoreName(store_image_id);
+            }
+            String store_phone_nu = data.getString("store_phone_nu");
+            if(!store_phone_nu.isEmpty()){
+                store.setStoreName(store_phone_nu);
+            }
+            storeRepository.save(store);
+            return "{\"status\": \"ok\"}";
+        }
+        catch(Exception ex){
+            ex.printStackTrace();
+            return "{\"status\": \"internal_error\"}";
+        }
     }
 
-    public String moditifyStores(JSONObject data){
-        System.out.println(data);
-        Stores store = storeRepository.findByStoreId(data.getLong("store_id"));
-        store.setStoreName(data.getString("name"));
-        store.setStoreAddress(data.getString("address"));
-        store.setStartTime(data.getString("starttime"));
-        store.setEndTime(data.getString("endtime"));
-        store.setCoverId(data.getString("store_image_id"));
-        store.setStorePhone(data.getString("store_phone_nu"));
-        storeRepository.save(store);
-        return "modify user success";
-    }
+    public String modifyDist(JSONObject data) {
 
-    public String moditifyDist(JSONObject data){
-        System.out.println(data);
-        Stores store = storeRepository.findByStoreId(data.getLong("store_id"));
-        store.setDistLocation(data.getString("location"));
-        store.setDistName(data.getString("truename"));
-        store.setDistPhone(data.getString("dist_phone_nu"));
-        store.setDistPassword(data.getString("password"));
-        store.setDistImageId(data.getString("dist_image_id"));
-        storeRepository.save(store);
-        return "modify user success";
-    }
+        try {
+            System.out.println(data);
+            Stores store = storeRepository.findByStoreId(data.getLong("store_id"));
 
+            String location = data.getString("location");
+            if (!location.isEmpty()) {
+                store.setDistLocation(location);
+            }
+
+            String truename = data.getString("truename");
+            if (!location.isEmpty()) {
+                store.setDistName(truename);
+            }
+
+            String dist_phone_nu = data.getString("dist_phone_nu");
+            if (!location.isEmpty()) {
+                store.setDistPhone(dist_phone_nu);
+            }
+
+            String password = data.getString("password");
+            if (!location.isEmpty()) {
+                store.setDistPassword(password);
+            }
+
+            String dist_image_id = data.getString("dist_image_id");
+            if (!location.isEmpty()) {
+                store.setDistImageId(dist_image_id);
+            }
+            storeRepository.save(store);
+            return "{\"status\": \"ok\"}";
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return "{\"status\": \"internal_error\"}";
+        }
+    }
 }
+
+

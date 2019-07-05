@@ -7,16 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-public class AdminModifityDist {
+public class AdminModifyDist {
     @Autowired
     private AdminService adminService;
 
 
-    @RequestMapping(value = "/admin/moditifydist",method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-    public
+    @RequestMapping(value = "/admin/modifydist",method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     @ResponseBody
-    String adminModitifyDist(@RequestBody JSONObject data){
-        return this.adminService.moditifyDist(data);
+    public String adminModifyDist(@RequestBody JSONObject data){
+        return this.adminService.modifyDist(data);
     }
-
 }
