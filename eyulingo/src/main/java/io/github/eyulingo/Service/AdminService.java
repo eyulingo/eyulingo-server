@@ -12,8 +12,9 @@ public interface AdminService {
 
     public JSONArray getAllStores();
 
-    public String moditifyStores(JSONObject data);
+    public String modifyStores(JSONObject data);
 
-    public String moditifyDist(JSONObject data);
+    public String modifyDist(JSONObject data);
 
 }
+

@@ -14,7 +14,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
  */
 @Configuration
 @EnableWebSecurity //开启Spring Security的功能
-@EnableGlobalMethodSecurity(prePostEnabled = true)//开启注解控制权限
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     /**
@@ -23,7 +22,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity webSecurity) throws Exception {
 
-        webSecurity.ignoring().antMatchers("/css/**");
+        webSecurity.ignoring().antMatchers("/store/**", "/admin/**");
     }
 
     /**
@@ -32,7 +31,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-                .authorizeRequests().antMatchers("/dist/**", "/admin/**","/img/download", "/img/upload", "/login", "/failure", "/ok").permitAll()
+                .authorizeRequests().antMatchers("/store/**", "/admin/**","/img/download", "/img/upload", "/login", "/failure", "/ok").permitAll()
                 // 对于网站部分资源需要指定鉴权
 //             .antMatchers("/admin/**").hasRole("R_ADMIN")
                 // 除上面外的所有请求全部需要鉴权认证

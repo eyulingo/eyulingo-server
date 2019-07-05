@@ -32,6 +32,9 @@ public class Goods {
     @Column(name="good_image_id")
     private String goodImageId;
 
+    @Column(name = "hidden")
+    private  Boolean hidden;
+
     public Goods(){
 
     }
@@ -97,5 +100,13 @@ public class Goods {
 
     public void setStoreId(String storeId) {
         this.storeId = storeId;
+    }
+
+    public Boolean getHidden() {
+        return hidden;
+    }
+
+    public void setHidden(Boolean hidden) {
+        this.hidden = hidden;
     }
 }

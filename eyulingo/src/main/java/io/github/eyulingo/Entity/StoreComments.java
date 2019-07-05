@@ -1,13 +1,11 @@
 package io.github.eyulingo.Entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
-@Table(name = " StoreComments")
+@IdClass(StoreCommentsPK.class)
+@Table(name = "storecomments")
 public class StoreComments implements Serializable {
     @Id
     @Column(name = "store_id")
@@ -20,7 +18,7 @@ public class StoreComments implements Serializable {
     @Column(name = "star")
     private Long star;
 
-    @Column(name = "store_comments")
+    @Column(name = "store_comment")
     private String storeComments;
 
     public StoreComments(){
