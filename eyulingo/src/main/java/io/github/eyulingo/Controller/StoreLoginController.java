@@ -19,10 +19,13 @@ public class StoreLoginController {
     public
     @ResponseBody
     String storeLogin(@RequestBody JSONObject data, HttpServletResponse httpServletResponse){
+
         Cookie ck0 = new Cookie("distName",data.getString("distName"));
         Cookie ck1 = new Cookie("distPassword",data.getString("password"));
+
         httpServletResponse.addCookie(ck0);
         httpServletResponse.addCookie(ck1);
         return this.storeService.distLogin(data);
     }
+
 }
