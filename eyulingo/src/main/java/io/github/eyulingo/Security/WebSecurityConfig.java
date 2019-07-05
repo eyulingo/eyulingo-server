@@ -14,7 +14,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
  */
 @Configuration
 @EnableWebSecurity //开启Spring Security的功能
-@EnableGlobalMethodSecurity(prePostEnabled = true)//开启注解控制权限
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     /**
@@ -23,7 +22,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity webSecurity) throws Exception {
 
-        webSecurity.ignoring().antMatchers("/css/**");
+        webSecurity.ignoring().antMatchers("/dist/**", "/admin/**");
     }
 
     /**
