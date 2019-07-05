@@ -21,7 +21,7 @@ public class Users  {
     @Column(name = "user_phone")
     private String userPhone;
 
-    @Column(name = "image_id")
+    @Column(name = "cover_id")
     private String imageId;
 
     public Users() {

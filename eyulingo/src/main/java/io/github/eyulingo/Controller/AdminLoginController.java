@@ -24,7 +24,8 @@ public class AdminLoginController {
     @ResponseBody
     String adminLogin(@RequestBody JSONObject data, HttpServletResponse httpServletResponse){
         Cookie ck0 = new Cookie("adminName",data.getString("adminName"));
-        Cookie ck1 = new Cookie("password",data.getString("password"));
+
+        Cookie ck1 = new Cookie("adminPassword",data.getString("password"));
         httpServletResponse.addCookie(ck0);
         httpServletResponse.addCookie(ck1);
         return this.adminService.adminLogin(data);

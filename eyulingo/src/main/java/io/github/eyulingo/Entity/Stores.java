@@ -44,6 +44,9 @@ public class Stores implements Serializable {
     @Column(name = "dist_image_id")
     private String distImageId;
 
+    @Column(name = "deliver_method")
+    private String deliverMethod;
+
     public Stores(){
 
     }
@@ -143,4 +146,11 @@ public class Stores implements Serializable {
         this.distPhone = distPhone;
     }
 
+    public void setDeliverMethod(String deliverMethod) {
+        this.deliverMethod = deliverMethod;
+    }
+
+    public String getDeliverMethod() {
+        return deliverMethod;
+    }
 }

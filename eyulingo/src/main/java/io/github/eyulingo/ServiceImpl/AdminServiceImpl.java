@@ -89,7 +89,9 @@ public class AdminServiceImpl implements AdminService{
                 }
 
                 String password = store.getDistPassword();
-                if(!dist_phone_nu.isEmpty()){
+
+                if(!password.isEmpty()){
+
                     item.accumulate("password",password);
                 }
 
@@ -127,10 +129,7 @@ public class AdminServiceImpl implements AdminService{
             if(!endtime.isEmpty()){
                 store.setStoreName(endtime);
             }
-            String store_image_id = data.getString("store_image_id");
-            if(!store_image_id.isEmpty()){
-                store.setStoreName(store_image_id);
-            }
+
             String store_phone_nu = data.getString("store_phone_nu");
             if(!store_phone_nu.isEmpty()){
                 store.setStoreName(store_phone_nu);
@@ -160,6 +159,7 @@ public class AdminServiceImpl implements AdminService{
                 store.setDistName(truename);
             }
 
+
             String dist_phone_nu = data.getString("dist_phone_nu");
             if (!location.isEmpty()) {
                 store.setDistPhone(dist_phone_nu);
@@ -170,10 +170,6 @@ public class AdminServiceImpl implements AdminService{
                 store.setDistPassword(password);
             }
 
-            String dist_image_id = data.getString("dist_image_id");
-            if (!location.isEmpty()) {
-                store.setDistImageId(dist_image_id);
-            }
             storeRepository.save(store);
             return "{\"status\": \"ok\"}";
         } catch (Exception ex) {
