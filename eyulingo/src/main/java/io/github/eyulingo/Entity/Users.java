@@ -1,12 +1,21 @@
 package io.github.eyulingo.Entity;
 
 
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Table(name = "Users")
-public class Users  {
+public class Users implements UserDetails {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "user_id")
@@ -24,8 +33,6 @@ public class Users  {
     @Column(name = "image_id")
     private String imageId;
 
-    public Users() {
-    }
 
     public void setUserId(Long userId) {
         this.userId = userId;
@@ -43,14 +50,6 @@ public class Users  {
         return imageId;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
     public String getUserPhone() {
         return userPhone;
     }
@@ -66,5 +65,43 @@ public class Users  {
     public void setUserPhone(String userPhone) {
         this.userPhone = userPhone;
     }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        List<GrantedAuthority> auths=new ArrayList<GrantedAuthority>();
+
+        auths.add(new SimpleGrantedAuthority("User"));
+
+        return auths;
+    }
+
+    @Override
+    public String getUsername() {
+        return this.userName;
+    }
+
+    @Override
+    public String getPassword() { return this.password; }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
 }
 

@@ -144,4 +144,16 @@ public class Stores implements Serializable {
         this.distPhone = distPhone;
     }
 
+<<<<<<< Updated upstream
+=======
+    public void setDeliverMethod(String deliverMethod) {
+        this.deliverMethod = deliverMethod;
+    }
+
+    public String getDeliverMethod() {
+        return deliverMethod;
+    }
+
+
+>>>>>>> Stashed changes
 }
