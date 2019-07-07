@@ -163,8 +163,8 @@ public class StoreServiceImpl implements StoreService {
             JSONObject commentsitem = new JSONObject();
             Long userId = storeComments.getUserId();
             Users user= userRepository.findByUserId(userId);
-            System.out.printf("Found username %s by %d\n", user.getUserName(), user.getUserId());
-            commentsitem.accumulate("username",user.getUserName() );
+            System.out.printf("Found username %s by %d\n", user.getUsername(), user.getUserId());
+            commentsitem.accumulate("username",user.getUsername() );
             commentsitem.accumulate("comment_content",storeComments.getStoreComments() );
             commentsitem.accumulate("star_count",storeComments.getStar() );
             comments.add(commentsitem);

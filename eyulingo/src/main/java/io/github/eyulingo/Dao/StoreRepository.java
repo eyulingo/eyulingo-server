@@ -14,7 +14,7 @@ public interface StoreRepository extends CrudRepository<Stores,Long>
 
         Stores  findByStoreName(String storeName);
 
-        List<Stores>  findByDistName(String distName);
+        Stores  findByDistName(String distName);
 
         List<Stores>  findAll();
 }
