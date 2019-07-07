@@ -14,8 +14,8 @@ echo `service mysql status`
 
 echo 'Initializing Data...'
 #导入数据
-mysql < /etc/mysql/init_db.sql
-mysql < /etc/mysql/add_example_data.sql
+mysql < /etc/mysql/initialize.sql
+# mysql < /etc/mysql/add_example_data.sql
 echo 'Done'
 
 sleep 1
