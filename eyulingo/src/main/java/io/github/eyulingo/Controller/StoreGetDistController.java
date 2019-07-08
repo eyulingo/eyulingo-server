@@ -22,6 +22,7 @@ public class StoreGetDistController {
         Cookie[] cookies = httpRequest.getCookies();
         for (Cookie cc:cookies){
             if (cc.getName().equals("distName")){
+
                 return this.storeService.getDist(cc.getValue());
             }
         }

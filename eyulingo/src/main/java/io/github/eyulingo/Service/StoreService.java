@@ -12,4 +12,6 @@ public interface StoreService {
     public String modifyDist(JSONObject data);
 
     public JSONObject getMyStore(String data);
+
+    public  String ChangeDistImage(String distName,JSONObject data);
 }
