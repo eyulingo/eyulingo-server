@@ -1,4 +1,4 @@
-package io.github.eyulingo.Controller;
+package io.github.eyulingo.Controller.Admins;
 
 
 import io.github.eyulingo.Service.AdminService;

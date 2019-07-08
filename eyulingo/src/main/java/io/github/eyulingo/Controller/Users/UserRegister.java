@@ -1,4 +1,4 @@
-package io.github.eyulingo.Controller;
+package io.github.eyulingo.Controller.Users;
 
 
 import io.github.eyulingo.Service.UserService;

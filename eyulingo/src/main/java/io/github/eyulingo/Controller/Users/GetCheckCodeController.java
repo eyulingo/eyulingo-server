@@ -1,4 +1,4 @@
-package io.github.eyulingo.Controller;
+package io.github.eyulingo.Controller.Users;
 
 
 import io.github.eyulingo.Service.UserService;
@@ -17,7 +17,7 @@ public class GetCheckCodeController {
     public
     @ResponseBody
     JSONObject userGetCheckCode(@RequestBody JSONObject data){
-        if(data.getString("phone_nu").length()!= 11 || data.getString("phone_nu").subSequence(0, 1) != "1"){
+        if(data.getString("phone_nu").length()!= 11 || data.getString("phone_nu").startsWith("1")){
             JSONObject item = new JSONObject();
             item.accumulate("status","bad_phone");
             return item;

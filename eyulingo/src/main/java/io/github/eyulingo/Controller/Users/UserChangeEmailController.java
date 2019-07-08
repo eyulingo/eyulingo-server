@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-public class UserChangePhoneController {
+public class UserChangeEmailController {
     @Autowired
     private UserService userService;
 
@@ -14,11 +14,7 @@ public class UserChangePhoneController {
     public
     @ResponseBody
     String userChangePhone(@RequestBody JSONObject data){
-        if(data.getString("new_phone_nu").length() != 11){
-            return "{\"status\": \"bad_phone\"}";
-        }
-        else {
-            return this.userService.changePhone(data);
-        }
+            return this.userService.changeEmail(data);
+
     }
 }

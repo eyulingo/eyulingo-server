@@ -1,4 +1,4 @@
-package io.github.eyulingo.Controller;
+package io.github.eyulingo.Controller.Stores;
 
 
 import io.github.eyulingo.Service.StoreService;

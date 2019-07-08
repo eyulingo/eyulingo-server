@@ -28,8 +28,8 @@ public class Users implements UserDetails {
     @Column(name = "password")
     private String password;
 
-    @Column(name = "user_phone")
-    private String userPhone;
+    @Column(name = "user_email")
+    private String userEmail;
 
     @Column(name = "cover_id")
     private String imageId;
@@ -51,9 +51,6 @@ public class Users implements UserDetails {
         return imageId;
     }
 
-    public String getUserPhone() {
-        return userPhone;
-    }
 
     public void setImageId(String imageId) {
         this.imageId = imageId;
@@ -63,8 +60,12 @@ public class Users implements UserDetails {
         this.userName = userName;
     }
 
-    public void setUserPhone(String userPhone) {
-        this.userPhone = userPhone;
+    public String getUserEmail() {
+        return userEmail;
+    }
+
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
     }
 
     @Override

@@ -1,4 +1,4 @@
-package io.github.eyulingo.Controller
+package io.github.eyulingo.Controller.Users
 
 import net.sf.json.JSONObject
 import org.springframework.web.bind.annotation.*

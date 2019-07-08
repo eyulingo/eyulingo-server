@@ -5,7 +5,6 @@ import io.github.eyulingo.Dao.UserRepository;
 import io.github.eyulingo.Entity.CheckCodes;
 import io.github.eyulingo.Entity.Users;
 import io.github.eyulingo.Service.UserService;
-import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,13 +12,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.sql.Timestamp;
-import io.github.eyulingo.Entity.Users;
 
 import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
-
     @Autowired
     UserRepository userRepository;
 
@@ -27,11 +24,11 @@ public class UserServiceImpl implements UserService {
     CheckCodeRepository checkCodeRepository;
 
     public JSONObject getCheckCode(JSONObject data){
-        String phone = data.getString("phone_nu");
+        String email = data.getString("email");
         JSONObject item = new JSONObject();
-        Users usertest = userRepository.findByUserPhone(phone);
+        Users usertest = userRepository.findByUserEmail(email);
         if(usertest != null){
-            item.accumulate("status","internal_error");
+            item.accumulate("status","exist email");
             return item;
 
         }
@@ -39,12 +36,12 @@ public class UserServiceImpl implements UserService {
             Date date = new Date();
             Timestamp nowdate = new Timestamp(date.getTime());
             String chars = "0123456789";
-            String code = "";
+            String code = new String();
             for (int i = 0; i < 6; i++) {
                 code = chars.charAt((int) (Math.random() * 10)) + code;
             }
             CheckCodes checkCodes = new CheckCodes();
-            checkCodes.setPhoneNum(phone);
+            checkCodes.setUserEmail(email);
             checkCodes.setCheckCode(code);
             checkCodes.setTime(nowdate);
             checkCodeRepository.save(checkCodes);
@@ -57,12 +54,12 @@ public class UserServiceImpl implements UserService {
 
 
     public String register(JSONObject data) {
-        String phone_nu = data.getString("phone_nu");
+        String email = data.getString("email");
         String username = data.getString("username");
         String password = data.getString("password");
         String confirm_password = data.getString("confirm_password");
         String confirm_code = data.getString("confirm_code");
-        Users usertest1 = userRepository.findByUserPhone(phone_nu);
+        Users usertest1 = userRepository.findByUserEmail(email);
         Users usertest2 = userRepository.findByUserName(username);
         Date now = new Date();
         Date date = new Date(now.getTime()-180000);
@@ -77,7 +74,7 @@ public class UserServiceImpl implements UserService {
             return  "{\"status\": \"bad_username\"}";
         }
         else {
-            List<CheckCodes> LCode = checkCodeRepository.findByPhoneNum(phone_nu);
+            List<CheckCodes> LCode = checkCodeRepository.findByUserEmail(email);
             if (LCode.size() != 0) {
                 CheckCodes newestCode = LCode.get(0);
                 for (CheckCodes code : LCode) {
@@ -90,7 +87,7 @@ public class UserServiceImpl implements UserService {
                     Users newuser = new Users();
                     newuser.setPassword(password);
                     newuser.setUserName(username);
-                    newuser.setUserPhone(phone_nu);
+                    newuser.setUserEmail(email);
                     newuser.setImageId("0");
                     userRepository.save(newuser);
                     return "{\"status\": \"ok\"}";
@@ -112,7 +109,7 @@ public class UserServiceImpl implements UserService {
             JSONObject item = new JSONObject();
             item.accumulate("userid", currentUser.getUserId());
             item.accumulate("username", currentUser.getUsername());
-            item.accumulate("user_phone", currentUser.getUserPhone());
+            item.accumulate("email", currentUser.getUserEmail());
             item.accumulate("avatar", currentUser.getImageId());
             item.accumulate("status", "ok");
             return item;
@@ -137,5 +134,57 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    public String changePassword(JSONObject data){
 
+            UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            Users currentUser = userRepository.findByUserName(userDetails.getUsername());
+            if(data.getString("origin_password").equals(currentUser.getPassword())){
+                if(data.getString("new_password").equals(data.getString("confirm_new_password"))){
+                    if(!data.getString("new_password").equals(data.getString("origin_password"))){
+                        return "{\"status\": \"origin_name is same with new_password\"}";
+                    }
+                    else {
+                        currentUser.setPassword(data.getString("new_password"));
+                        userRepository.save(currentUser);
+                        return "{\"status\": \"ok\"}";
+                    }
+                }
+                else{
+                    return "{\"status\": \"bad_confirm\"}";
+                }
+            }
+            else{
+                return "{\"status\": \"wrong_origin_password\"}";
+            }
+    }
+
+    public String changeEmail(JSONObject data){
+        String new_email = data.getString("new_email");
+        String check_code = data.getString("confirm_code");
+        Date now = new Date();
+        Date date = new Date(now.getTime()-180000);
+        Timestamp registerdate = new Timestamp(date.getTime());
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Users currentUser = userRepository.findByUserName(userDetails.getUsername());
+        List<CheckCodes> LCode = checkCodeRepository.findByUserEmail(currentUser.getUserEmail());
+        if (LCode.size() != 0) {
+            CheckCodes newestCode = LCode.get(0);
+            for (CheckCodes code : LCode) {
+                if (code.getTime().compareTo(newestCode.getTime()) <= 0) {
+                    newestCode = code;
+                }
+
+            }
+            if (newestCode.getTime().compareTo(registerdate) >= 0 && newestCode.getCheckCode().equals(check_code)) {
+                currentUser.setUserEmail(new_email);
+                userRepository.save(currentUser);
+                return "{\"status\": \"ok\"}";
+            } else {
+                return "{\"status\": \"bad_confirm_code\"}";
+            }
+        }
+        else {
+            return "{\"status\": \"bad_confirm_code\"}";
+        }
+    }
 }
