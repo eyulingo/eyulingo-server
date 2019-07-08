@@ -21,6 +21,7 @@ public class StoreGetStoreController {
     public
     @ResponseBody
     JSONObject storeGetStore(HttpServletRequest httpRequest){
+//        String cookie=httpRequest.getHeader("cookie");
         Cookie[] cookies = httpRequest.getCookies();
         for (Cookie cc:cookies){
             if (cc.getName().equals("distName")){

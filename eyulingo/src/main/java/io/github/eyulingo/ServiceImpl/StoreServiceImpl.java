@@ -87,7 +87,7 @@ public class StoreServiceImpl implements StoreService {
 
         try {
             System.out.println(data);
-            Stores store = storeRepository.findByStoreId(data.getLong("store_id"));
+            Stores store = storeRepository.findByDistName(data.getString("truename"));
 
             String location = data.getString("location");
             if (!location.isEmpty()) {
@@ -164,7 +164,8 @@ public class StoreServiceImpl implements StoreService {
             Long userId = storeComments.getUserId();
             Users user= userRepository.findByUserId(userId);
             System.out.printf("Found username %s by %d\n", user.getUsername(), user.getUserId());
-            commentsitem.accumulate("username",user.getUsername() );
+
+            commentsitem.accumulate("username",user.getUsername());
             commentsitem.accumulate("comment_content",storeComments.getStoreComments() );
             commentsitem.accumulate("star_count",storeComments.getStar() );
             comments.add(commentsitem);
@@ -173,5 +174,13 @@ public class StoreServiceImpl implements StoreService {
 
         return item;
 
+    }
+
+    public String ChangeDistImage(String name,JSONObject data){
+        System.out.println(name);
+            Stores store = storeRepository.findByDistName(name);
+            store.setDistImageId(data.getString("image_id"));
+            storeRepository.save(store);
+            return "{\"status\": \"ok\"}";
     }
 }

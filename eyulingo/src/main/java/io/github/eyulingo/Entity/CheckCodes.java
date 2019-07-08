@@ -7,7 +7,7 @@ import javax.persistence.Table;
 import java.sql.Timestamp;
 
 @Entity
-@Table(name = "CheckCodes")
+@Table(name = "checkcodes")
 public class CheckCodes {
     @Id
     @Column(name = "phone_num")

@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "OrderItems")
+@Table(name = "orderItems")
 public class OrderItems implements Serializable {
     @Id
     @Column(name = "store_id")

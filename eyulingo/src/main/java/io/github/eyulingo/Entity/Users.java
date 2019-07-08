@@ -3,23 +3,23 @@ package io.github.eyulingo.Entity;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.io.Serializable;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-@Entity
+
 @Table(name = "Users")
+
 public class Users implements UserDetails {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "user_id")
-    private Long userId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer userId;
 
     @Column(name = "user_name")
     private String userName;
@@ -34,7 +34,7 @@ public class Users implements UserDetails {
     private String imageId;
 
 
-    public void setUserId(Long userId) {
+    public void setUserId(Integer userId) {
         this.userId = userId;
     }
 
@@ -42,7 +42,7 @@ public class Users implements UserDetails {
         this.password = password;
     }
 
-    public Long getUserId() {
+    public Integer getUserId() {
         return userId;
     }
 

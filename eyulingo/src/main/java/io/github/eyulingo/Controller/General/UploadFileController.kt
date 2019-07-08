@@ -1,4 +1,5 @@
-package io.github.eyulingo.Controller
+
+package io.github.eyulingo.Controller.General;
 
 import com.mongodb.MongoClient
 import com.mongodb.MongoClientURI
