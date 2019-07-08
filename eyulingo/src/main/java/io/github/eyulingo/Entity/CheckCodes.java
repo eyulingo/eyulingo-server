@@ -10,8 +10,8 @@ import java.sql.Timestamp;
 @Table(name = "checkcodes")
 public class CheckCodes {
     @Id
-    @Column(name = "phone_num")
-    private String phoneNum;
+    @Column(name = "email_addr")
+    private String userEmail;
 
     @Column(name = "check_code")
     private String checkCode;
@@ -27,9 +27,7 @@ public class CheckCodes {
         return checkCode;
     }
 
-    public String getPhoneNum() {
-        return phoneNum;
-    }
+
 
     public Timestamp getTime() {
         return time;
@@ -39,8 +37,12 @@ public class CheckCodes {
         this.checkCode = checkCode;
     }
 
-    public void setPhoneNum(String phoneNum) {
-        this.phoneNum = phoneNum;
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
+    }
+
+    public String getUserEmail() {
+        return userEmail;
     }
 
     public void setTime(Timestamp time) {
