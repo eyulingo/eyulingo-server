@@ -1,14 +1,14 @@
 SET GLOBAL time_zone = "+8:00";
+
 FLUSH PRIVILEGES;
 
-DROP DATABASE IF EXISTS eyulingo_db;
+DROP DATABASE IF EXISTS `eyulingo_db`;
 
-CREATE DATABASE eyulingo_db;
+CREATE DATABASE IF NOT EXISTS `eyulingo_db` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
 
-ALTER DATABASE eyulingo_db CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+ALTER DATABASE `eyulingo_db` CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
-USE eyulingo_db;
-
+USE `eyulingo_db`;
 -- MySQL dump 10.13  Distrib 5.7.17, for macos10.12 (x86_64)
 --
 -- Host: localhost    Database: eyulingo_db
@@ -85,10 +85,10 @@ DROP TABLE IF EXISTS `checkcodes`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `checkcodes` (
-  `phone_num` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email_addr` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `check_code` varchar(8) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `time` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`phone_num`)
+  PRIMARY KEY (`email_addr`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -171,7 +171,7 @@ CREATE TABLE `goods` (
   PRIMARY KEY (`good_id`),
   KEY `store_id` (`store_id`),
   CONSTRAINT `goods_ibfk_1` FOREIGN KEY (`store_id`) REFERENCES `stores` (`store_id`) ON DELETE RESTRICT
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -297,7 +297,7 @@ CREATE TABLE `stores` (
   PRIMARY KEY (`store_id`,`dist_name`),
   KEY `deliver_method` (`deliver_method`),
   CONSTRAINT `stores_ibfk_1` FOREIGN KEY (`deliver_method`) REFERENCES `delivers` (`deliver_name`) ON DELETE RESTRICT
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -345,10 +345,10 @@ CREATE TABLE `users` (
   `user_id` int(11) NOT NULL AUTO_INCREMENT,
   `user_name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `password` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `user_phone` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `user_email` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `cover_id` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -357,7 +357,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'第灵韵','Dilingyun123456','13976189733','5d1d5cbe634459000715142f'),(2,'真采萱','Zhencaixuan123456','13677992319','5d1d5d326344590007151431'),(3,'谭凝','Tanning123456','15741863013','5d1d5d416344590007151433'),(4,'随千山','Suiqianshan123456','15588449523','5d1d5d526344590007151435'),(5,'颜清秋','Yanqingqiu123456','13002685402','5d1d5d5e6344590007151437'),(6,'无竹','Wuzhu123456','15719921442','5d1d5d6b6344590007151439');
+INSERT INTO `users` VALUES (1,'第灵韵','Dilingyun123456','lingyun@gmail.com','5d1d5cbe634459000715142f'),(2,'真采萱','Zhencaixuan123456','choihyun@outlook.com','5d1d5d326344590007151431'),(3,'谭凝','Tanning123456','tanning@sjtu.edu.cn','5d1d5d416344590007151433'),(4,'随千山','Suiqianshan123456','chinsaan@live.com','5d1d5d526344590007151435'),(5,'颜清秋','Yanqingqiu123456','qqyan@icloud.com','5d1d5d5e6344590007151437'),(6,'无竹','Wuzhu123456','wu_zhu@foxmail.com','5d1d5d6b6344590007151439');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -370,4 +370,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-07-07 11:29:02
+-- Dump completed on 2019-07-08 16:17:49
