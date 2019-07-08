@@ -17,11 +17,14 @@ public class GetCheckCodeController {
     public
     @ResponseBody
     JSONObject userGetCheckCode(@RequestBody JSONObject data){
-        if(data.getString("phone_nu").length()!=11){
+        if(data.getString("phone_nu").length()!= 11 || data.getString("phone_nu").subSequence(0, 1) != "1"){
             JSONObject item = new JSONObject();
-            item.accumulate("status","bad-phone");
+            item.accumulate("status","bad_phone");
+            return item;
         }
-        return this.userService.getCheckCode(data);
+        else {
+            return this.userService.getCheckCode(data);
+        }
     }
 
 }
