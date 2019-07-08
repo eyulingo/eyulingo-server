@@ -89,7 +89,9 @@ public class AdminServiceImpl implements AdminService{
                 }
 
                 String password = store.getDistPassword();
+
                 if(!password.isEmpty()){
+
                     item.accumulate("password",password);
                 }
 
@@ -127,6 +129,7 @@ public class AdminServiceImpl implements AdminService{
             if(!endtime.isEmpty()){
                 store.setStoreName(endtime);
             }
+
             String store_phone_nu = data.getString("store_phone_nu");
             if(!store_phone_nu.isEmpty()){
                 store.setStoreName(store_phone_nu);
@@ -155,6 +158,7 @@ public class AdminServiceImpl implements AdminService{
             if (!location.isEmpty()) {
                 store.setDistName(truename);
             }
+
 
             String dist_phone_nu = data.getString("dist_phone_nu");
             if (!location.isEmpty()) {

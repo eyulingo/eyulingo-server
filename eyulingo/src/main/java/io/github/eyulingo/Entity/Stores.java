@@ -146,6 +146,7 @@ public class Stores implements Serializable {
         this.distPhone = distPhone;
     }
 
+
     public void setDeliverMethod(String deliverMethod) {
         this.deliverMethod = deliverMethod;
     }
@@ -153,4 +154,5 @@ public class Stores implements Serializable {
     public String getDeliverMethod() {
         return deliverMethod;
     }
+
 }
