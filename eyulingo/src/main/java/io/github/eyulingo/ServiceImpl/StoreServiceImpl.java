@@ -1,23 +1,17 @@
 package io.github.eyulingo.ServiceImpl;
 
 
-
 import io.github.eyulingo.Dao.StoreCommentsRepository;
 import io.github.eyulingo.Dao.StoreRepository;
 import io.github.eyulingo.Dao.UserRepository;
 import io.github.eyulingo.Entity.StoreComments;
-
-import io.github.eyulingo.Dao.StoreRepository;
-
 import io.github.eyulingo.Entity.Stores;
 import io.github.eyulingo.Service.StoreService;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import io.github.eyulingo.Entity.Users;
-
 
 import java.util.List;
 
@@ -25,7 +19,7 @@ import java.util.List;
 public class StoreServiceImpl implements StoreService {
     @Autowired
     StoreRepository storeRepository;
-  
+
     @Autowired
     StoreCommentsRepository storeCommentsRepository;
 
@@ -37,7 +31,6 @@ public class StoreServiceImpl implements StoreService {
             System.out.println(data.getString("distName"));
             Stores dist = storeRepository.findByDistName(data.getString("distName"));
             if (dist == null) return "{\"status\": \"distName not exists\"}";
-
 
             if (dist.getDistPassword().equals(data.getString("password"))) {
                 return "{\"status\": \"ok\"}";
@@ -83,11 +76,11 @@ public class StoreServiceImpl implements StoreService {
         return item;
     }
 
-    public String modifyDist(JSONObject data) {
+    public String modifyDist(String name,JSONObject data) {
 
         try {
             System.out.println(data);
-            Stores store = storeRepository.findByDistName(data.getString("truename"));
+            Stores store = storeRepository.findByDistName(name);
 
             String location = data.getString("location");
             if (!location.isEmpty()) {
@@ -118,6 +111,7 @@ public class StoreServiceImpl implements StoreService {
 
     public JSONObject getMyStore(String data) {
         Stores store = storeRepository.findByDistName(data);
+        System.out.printf(data);
         JSONObject item = new JSONObject();
         item.accumulate("store_id", store.getStoreId());
         String name = store.getStoreName();
@@ -164,7 +158,6 @@ public class StoreServiceImpl implements StoreService {
             Long userId = storeComments.getUserId();
             Users user= userRepository.findByUserId(userId);
             System.out.printf("Found username %s by %d\n", user.getUsername(), user.getUserId());
-
             commentsitem.accumulate("username",user.getUsername());
             commentsitem.accumulate("comment_content",storeComments.getStoreComments() );
             commentsitem.accumulate("star_count",storeComments.getStar() );
@@ -173,7 +166,6 @@ public class StoreServiceImpl implements StoreService {
         item.accumulate("comments",comments);
 
         return item;
-
     }
 
     public String ChangeDistImage(String name,JSONObject data){

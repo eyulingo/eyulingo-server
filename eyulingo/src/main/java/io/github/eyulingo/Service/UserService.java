@@ -1,7 +1,7 @@
 package io.github.eyulingo.Service;
 
 import net.sf.json.JSONObject;
-
+import org.springframework.stereotype.Service;
 
 
 public interface UserService {
@@ -12,6 +12,4 @@ public interface UserService {
     public JSONObject getMe();
 
     public String changeImage(JSONObject data);
-
-
 }

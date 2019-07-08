@@ -19,6 +19,7 @@ import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
+
     @Autowired
     UserRepository userRepository;
 
@@ -38,7 +39,7 @@ public class UserServiceImpl implements UserService {
             Date date = new Date();
             Timestamp nowdate = new Timestamp(date.getTime());
             String chars = "0123456789";
-            String code = new String();
+            String code = "";
             for (int i = 0; i < 6; i++) {
                 code = chars.charAt((int) (Math.random() * 10)) + code;
             }
