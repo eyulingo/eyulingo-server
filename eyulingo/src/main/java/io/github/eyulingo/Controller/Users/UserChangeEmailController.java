@@ -10,7 +10,7 @@ public class UserChangeEmailController {
     @Autowired
     private UserService userService;
 
-    @RequestMapping(value = "/changephoneno",method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+    @RequestMapping(value = "/changeemail",method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     public
     @ResponseBody
     String userChangePhone(@RequestBody JSONObject data){
