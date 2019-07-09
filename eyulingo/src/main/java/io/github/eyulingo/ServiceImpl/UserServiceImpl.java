@@ -5,6 +5,9 @@ import io.github.eyulingo.Dao.UserRepository;
 import io.github.eyulingo.Entity.CheckCodes;
 import io.github.eyulingo.Entity.Users;
 import io.github.eyulingo.Service.UserService;
+
+import io.github.eyulingo.Utilities.CodeSender;
+import io.github.eyulingo.Utilities.VerifyCodeSender;
 import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,10 +36,11 @@ public class UserServiceImpl implements UserService {
 
         }
         else {
+
             Date date = new Date();
             Timestamp nowdate = new Timestamp(date.getTime());
             String chars = "0123456789";
-            String code = new String();
+            String code = "";
             for (int i = 0; i < 6; i++) {
                 code = chars.charAt((int) (Math.random() * 10)) + code;
             }
@@ -46,9 +50,20 @@ public class UserServiceImpl implements UserService {
             checkCodes.setTime(nowdate);
             checkCodeRepository.save(checkCodes);
             System.out.printf(code);
-            item.accumulate("code",code);
-            item.accumulate("status","ok");
-            return  item;
+
+
+            CodeSender vCS = new CodeSender();
+
+            try {
+                vCS.sendCode(email, code);
+//                item.accumulate("code", code);
+                item.accumulate("status","ok");
+                return item;
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                item.accumulate("status", "failed_to_send");
+                return item;
+            }
         }
     }
 
