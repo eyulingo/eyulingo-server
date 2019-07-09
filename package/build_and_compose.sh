@@ -1,7 +1,7 @@
 #!/usr/bin/env bash 
 
-mv ../eyulingo/src/main/resources/application.properties ../eyulingo/src/main/resources/application.properties.tmp
-mv ../eyulingo/src/main/resources/application.properties.disabled ../eyulingo/src/main/resources/application.properties
+cp ../eyulingo/src/main/properties_release/application.properties ../eyulingo/src/main/resources/application.properties
+
 cd sql-docker
 ./build_docker.sh
 
@@ -17,5 +17,4 @@ docker push yuxiqian/eyulingo-server
 
 docker-compose up
 
-mv ../eyulingo/src/main/resources/application.properties ../eyulingo/src/main/resources/application.properties.disabled
-mv ../eyulingo/src/main/resources/application.properties.tmp ../eyulingo/src/main/resources/application.properties
+cp ../eyulingo/src/main/properties_debug/application.properties ../eyulingo/src/main/resources/application.properties
