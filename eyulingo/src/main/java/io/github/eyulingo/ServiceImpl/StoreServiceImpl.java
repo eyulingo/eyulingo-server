@@ -81,6 +81,9 @@ public class StoreServiceImpl implements StoreService {
         try {
             System.out.println(data);
             Stores store = storeRepository.findByDistName(name);
+            if(storeRepository.findByDistName(data.getString("truename")) != null && !data.getString("truename").equals(name)){
+                return "{\"status\": \"used_name\"}";
+            }
 
             String location = data.getString("location");
             if (!location.isEmpty()) {
@@ -105,7 +108,7 @@ public class StoreServiceImpl implements StoreService {
             return "{\"status\": \"ok\"}";
         } catch (Exception ex) {
             ex.printStackTrace();
-            return "{\"status\": \"internal_error\"}";
+            return "{\"status\": \"modify failed\"}";
         }
     }
 
@@ -169,7 +172,7 @@ public class StoreServiceImpl implements StoreService {
     }
 
     public String ChangeDistImage(String name,JSONObject data){
-        System.out.println(name);
+            System.out.println(name);
             Stores store = storeRepository.findByDistName(name);
             store.setDistImageId(data.getString("image_id"));
             storeRepository.save(store);

@@ -21,14 +21,32 @@ public class StoreGetStoreController {
     public
     @ResponseBody
     JSONObject storeGetStore(HttpServletRequest httpRequest){
-//        String cookie=httpRequest.getHeader("cookie");
         Cookie[] cookies = httpRequest.getCookies();
+        JSONObject store =new JSONObject();
         for (Cookie cc:cookies){
             if (cc.getName().equals("distName")){
-                return this.storeService.getMyStore(cc.getValue());
+                store.accumulate("distName",cc.getValue());
+                break;
+            }
+
+        }
+        for (Cookie cc:cookies) {
+            if (cc.getName().equals("distPassword")) {
+                store.accumulate("password", cc.getValue());
+                break;
             }
         }
-        return null;
+        if(store.size()!=2){
+            JSONObject item = new JSONObject();
+            item.accumulate("status","not login");
+            return  item;
+        }
+        if(storeService.distLogin(store).equals("{\"status\": \"ok\"}")){
+            return this.storeService.getMyStore(store.getString("distName"));
+        }
+        JSONObject item = new JSONObject();
+        item.accumulate("status","not login");
+        return  item;
 
     }
 }

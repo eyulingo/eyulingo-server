@@ -31,8 +31,10 @@ public class AdminGetStores {
             }
 
         }
-        String test = adminService.adminLogin(admin);
-        if(test.equals("{\"status\": \"ok\"}")){
+        if(admin.size()!=2){
+            return  null;
+        }
+        if(adminService.adminLogin(admin).equals("{\"status\": \"ok\"}")){
             return this.adminService.getAllStores();
         }
         return  null;

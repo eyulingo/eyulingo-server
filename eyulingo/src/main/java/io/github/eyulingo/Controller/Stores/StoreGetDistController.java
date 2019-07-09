@@ -20,13 +20,31 @@ public class StoreGetDistController {
     @ResponseBody
     JSONObject storeGetDist(HttpServletRequest httpRequest){
         Cookie[] cookies = httpRequest.getCookies();
+        JSONObject store =new JSONObject();
         for (Cookie cc:cookies){
             if (cc.getName().equals("distName")){
+                store.accumulate("distName",cc.getValue());
+                break;
+            }
 
-                return this.storeService.getDist(cc.getValue());
+        }
+        for (Cookie cc:cookies) {
+            if (cc.getName().equals("distPassword")) {
+                store.accumulate("password", cc.getValue());
+                break;
             }
         }
-        return null;
+        if(store.size()!=2){
+            JSONObject item = new JSONObject();
+            item.accumulate("status","not login");
+            return  item;
+        }
+        if(storeService.distLogin(store).equals("{\"status\": \"ok\"}")){
+            return this.storeService.getDist(store.getString("distName"));
+        }
+        JSONObject item = new JSONObject();
+        item.accumulate("status","not login");
+        return  item;
 
     }
 }
