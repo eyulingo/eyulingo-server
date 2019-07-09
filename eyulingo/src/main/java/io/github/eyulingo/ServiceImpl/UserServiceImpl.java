@@ -5,9 +5,7 @@ import io.github.eyulingo.Dao.UserRepository;
 import io.github.eyulingo.Entity.CheckCodes;
 import io.github.eyulingo.Entity.Users;
 import io.github.eyulingo.Service.UserService;
-
 import io.github.eyulingo.Utilities.CodeSender;
-import io.github.eyulingo.Utilities.VerifyCodeSender;
 import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,6 +13,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.sql.Timestamp;
+
+
 
 import java.util.List;
 
@@ -30,17 +30,21 @@ public class UserServiceImpl implements UserService {
         String email = data.getString("email");
         JSONObject item = new JSONObject();
         Users usertest = userRepository.findByUserEmail(email);
-        if(usertest != null){
+        if(!email.matches("\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*"))
+        {
+            item.accumulate("status","bad_email");
+            return item;
+        }
+        else if(usertest != null){
             item.accumulate("status","exist email");
             return item;
 
         }
         else {
-
             Date date = new Date();
             Timestamp nowdate = new Timestamp(date.getTime());
             String chars = "0123456789";
-            String code = "";
+            String code = new String();
             for (int i = 0; i < 6; i++) {
                 code = chars.charAt((int) (Math.random() * 10)) + code;
             }
@@ -50,8 +54,6 @@ public class UserServiceImpl implements UserService {
             checkCodes.setTime(nowdate);
             checkCodeRepository.save(checkCodes);
             System.out.printf(code);
-
-
             CodeSender vCS = new CodeSender();
 
             try {
@@ -79,14 +81,25 @@ public class UserServiceImpl implements UserService {
         Date now = new Date();
         Date date = new Date(now.getTime()-180000);
         Timestamp registerdate = new Timestamp(date.getTime());
-        if(!password.equals(confirm_password)) {
-            return  "{\"status\": \"bad_confirm\"}";
+        if(username.isEmpty()){
+            return  "{\"status\": \"username can't be empty\"}";
+        }
+        else if(password.isEmpty()){
+            return  "{\"status\": \"password can't be empty\"}";
+        }
+        else if(!password.equals(confirm_password)) {
+            return  "{\"status\": \"bad_confirm_password\"}";
         }
         else if(usertest1 != null){
-            return  "{\"status\": \"bad_phone_nu\"}";
+            return  "{\"status\": \"email_exist\"}";
         }
         else if(usertest2 != null){
-            return  "{\"status\": \"bad_username\"}";
+            return  "{\"status\": \"username_exist\"}";
+        }
+        else if(!email.matches("\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*"))
+        {
+
+            return "{\"status\": \"bad_email\"}";
         }
         else {
             List<CheckCodes> LCode = checkCodeRepository.findByUserEmail(email);
@@ -153,6 +166,9 @@ public class UserServiceImpl implements UserService {
 
             UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             Users currentUser = userRepository.findByUserName(userDetails.getUsername());
+            if(data.getString("new_password").isEmpty() || data.getString("origin_password").isEmpty() || data.getString("confirm_new_password").isEmpty()){
+                return "{\"status\": \"password can't be empty\"}";
+            }
             if(data.getString("origin_password").equals(currentUser.getPassword())){
                 if(data.getString("new_password").equals(data.getString("confirm_new_password"))){
                     if(!data.getString("new_password").equals(data.getString("origin_password"))){
@@ -175,6 +191,10 @@ public class UserServiceImpl implements UserService {
 
     public String changeEmail(JSONObject data){
         String new_email = data.getString("new_email");
+        if(!new_email.matches("\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*"))
+        {
+            return "{\"status\": \"bad_email\"}";
+        }
         String check_code = data.getString("confirm_code");
         Date now = new Date();
         Date date = new Date(now.getTime()-180000);

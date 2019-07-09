@@ -9,11 +9,14 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
 
 
 @RestController
 public class StoreDistModifyController {
+
+
     @Autowired
     private StoreService storeService;
 
@@ -31,18 +34,36 @@ public class StoreDistModifyController {
 
     @RequestMapping(value = "/store/modifydist",method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     @ResponseBody
-    public String adminModifyDist(@RequestBody JSONObject data, HttpServletRequest httpRequest){
-
+    public String adminModifyDist(@RequestBody JSONObject data, HttpServletRequest httpRequest, HttpServletResponse httpServletResponse){
         Cookie[] cookies = httpRequest.getCookies();
-        if(cookies != null) {
-            for (Cookie cc : cookies) {
-                if (cc.getName().equals("distName")) {
-                    String name = convertEncodingFormat(cc.getValue(), "iso-8859-1", "UTF-8");
-                    return this.storeService.modifyDist(name, data);
-                }
+        JSONObject store =new JSONObject();
+        for (Cookie cc:cookies){
+            if (cc.getName().equals("distName")){
+                String name = convertEncodingFormat(cc.getValue(), "iso-8859-1", "UTF-8");
+                store.accumulate("distName",name);
+                break;
             }
         }
-
-        return "{\"status\": \"internal_error\"}";
+        for (Cookie cc:cookies) {
+            if (cc.getName().equals("distPassword")) {
+                store.accumulate("password", cc.getValue());
+                break;
+            }
+        }
+        if(store.size()!=2){
+            return  "{\"status\": \"not login in\"}";
+        }
+        if(storeService.distLogin(store).equals("{\"status\": \"ok\"}")){
+            String isright = this.storeService.modifyDist(store.getString("distName"),data);
+            if(isright.equals("{\"status\": \"ok\"}")){
+                Cookie ck0 = new Cookie("distName", data.getString("truename"));
+                Cookie ck1 = new Cookie("distPassword", data.getString("password"));
+                httpServletResponse.addCookie(ck0);
+                httpServletResponse.addCookie(ck1);
+                return  isright;
+            }
+            return isright;
+        }
+        return "{\"status\": \"not login \"}";
     }
 }
