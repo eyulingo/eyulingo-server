@@ -182,32 +182,32 @@ public class UserServiceImpl implements UserService {
 
     public String changePassword(JSONObject data){
 
-            UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            Users currentUser = userRepository.findByUserName(userDetails.getUsername());
-            if(data.getString("new_password").isEmpty() || data.getString("origin_password").isEmpty() || data.getString("confirm_new_password").isEmpty()){
-                return "{\"status\": \"password can't be empty\"}";
-            }
-            if(!data.getString("new_password").matches("^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z_]{8,20}$")){
-                return  "{\"status\": \"bad_form_password\"}";
-            }
-            if(data.getString("origin_password").equals(currentUser.getPassword())){
-                if(data.getString("new_password").equals(data.getString("confirm_new_password"))){
-                    if(data.getString("new_password").equals(data.getString("origin_password"))){
-                        return "{\"status\": \"origin_name is same with new_password\"}";
-                    }
-                    else {
-                        currentUser.setPassword(data.getString("new_password"));
-                        userRepository.save(currentUser);
-                        return "{\"status\": \"ok\"}";
-                    }
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Users currentUser = userRepository.findByUserName(userDetails.getUsername());
+        if(data.getString("new_password").isEmpty() || data.getString("origin_password").isEmpty() || data.getString("confirm_new_password").isEmpty()){
+            return "{\"status\": \"password can't be empty\"}";
+        }
+        if(!data.getString("new_password").matches("^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z_]{8,20}$")){
+            return  "{\"status\": \"bad_form_password\"}";
+        }
+        if(data.getString("origin_password").equals(currentUser.getPassword())){
+            if(data.getString("new_password").equals(data.getString("confirm_new_password"))){
+                if(data.getString("new_password").equals(data.getString("origin_password"))){
+                    return "{\"status\": \"origin_name is same with new_password\"}";
                 }
-                else{
-                    return "{\"status\": \"bad_confirm\"}";
+                else {
+                    currentUser.setPassword(data.getString("new_password"));
+                    userRepository.save(currentUser);
+                    return "{\"status\": \"ok\"}";
                 }
             }
             else{
-                return "{\"status\": \"wrong_origin_password\"}";
+                return "{\"status\": \"bad_confirm\"}";
             }
+        }
+        else{
+            return "{\"status\": \"wrong_origin_password\"}";
+        }
     }
 
     public String changeEmail(JSONObject data){
@@ -274,7 +274,7 @@ public class UserServiceImpl implements UserService {
                 item.accumulate("status","bad_email");
                 return item;
             }
-            else if(emalitset.size() != 0 && lastGetTime.compareTo(getDate) >= 0){
+            else if(lastGetTime.compareTo(getDate) >= 0){
                 item.accumulate("status","Two applications should be three minutes apart ");
                 return item;
             }
@@ -286,11 +286,9 @@ public class UserServiceImpl implements UserService {
                 for (int i = 0; i < 6; i++) {
                     code = chars.charAt((int) (Math.random() * 10)) + code;
                 }
-                CheckCodes checkCodes = new CheckCodes();
-                checkCodes.setUserEmail(email);
-                checkCodes.setCheckCode(code);
-                checkCodes.setTime(nowdate);
-                checkCodeRepository.save(checkCodes);
+                newestCode.setCheckCode(code);
+                newestCode.setTime(nowdate);
+                checkCodeRepository.save(newestCode);
                 System.out.printf(code);
                 CodeSender vCS = new CodeSender();
 
@@ -338,10 +336,9 @@ public class UserServiceImpl implements UserService {
 
                 }
                 if (newestCode.getTime().compareTo(finddate) >= 0 && newestCode.getCheckCode().equals(confirm_code)) {
-                    Users newuser = new Users();
-                    newuser.setPassword(password);
-                    newuser.setUserName(username);
-                    userRepository.save(newuser);
+                    missUser.setPassword(password);
+                    missUser.setUserName(username);
+                    userRepository.save(missUser);
                     return "{\"status\": \"ok\"}";
                 } else {
                     return "{\"status\": \"bad_confirm_code\"}";
