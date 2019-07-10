@@ -33,43 +33,33 @@ public class StoreChangeDistImageController {
     @ResponseBody
     String userChangeImage(HttpServletRequest httpRequest,@RequestBody JSONObject data){
         Cookie[] cookies = httpRequest.getCookies();
-        JSONObject store =new JSONObject();
-        for (Cookie cc:cookies){
-            if (cc.getName().equals("distName")){
-                String name = convertEncodingFormat(cc.getValue(), "iso-8859-1", "UTF-8");
-                store.accumulate("distName",name);
-                break;
-            }
+        if (cookies == null) {
+            return "{\"status\": \"not login in\"}";
         }
-        for (Cookie cc:cookies) {
-            if (cc.getName().equals("distPassword")) {
-                store.accumulate("password", cc.getValue());
-                break;
-            }
-        }
-        if(store.size()!=2){
-            return  "{\"status\": \"not login in\"}";
-        }
-        if(storeService.distLogin(store).equals("{\"status\": \"ok\"}")){
-            return this.storeService.ChangeDistImage(store.getString("distName"),data);
-        }else{
-            return "{\"status\": \"not login\"}";
-        }
-
-    }
-
-       /* Cookie[] cookies = httpRequest.getCookies();
-        if(cookies != null) {
+        else{
+            JSONObject store = new JSONObject();
             for (Cookie cc : cookies) {
                 if (cc.getName().equals("distName")) {
                     String name = convertEncodingFormat(cc.getValue(), "iso-8859-1", "UTF-8");
-                    return this.storeService.ChangeDistImage(name, data);
+                    store.accumulate("distName", name);
+                    break;
                 }
+            }
+            for (Cookie cc : cookies) {
+                if (cc.getName().equals("distPassword")) {
+                    store.accumulate("password", cc.getValue());
+                    break;
+                }
+            }
+            if (store.size() != 2) {
+                return "{\"status\": \"not login in\"}";
+            }
+            if (storeService.distLogin(store).equals("{\"status\": \"ok\"}")) {
+                return this.storeService.ChangeDistImage(store.getString("distName"), data);
+            } else {
+                return "{\"status\": \"not login\"}";
             }
         }
 
-        return "{\"status\": \"internal_error\"}";
     }
-    */
-
 }

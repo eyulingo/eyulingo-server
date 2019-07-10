@@ -19,24 +19,28 @@ public class AdminGetStores {
     @RequestMapping(value = "/admin/getstore",method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
     public
     @ResponseBody
-    JSONArray adminGetAllStore(HttpServletRequest httpRequest){
+    JSONArray adminGetAllStore(HttpServletRequest httpRequest) {
         Cookie[] cookies = httpRequest.getCookies();
-        JSONObject admin =new JSONObject();
-        for (Cookie cc:cookies){
-            if (cc.getName().equals("adminName")){
-                admin.accumulate("adminName",cc.getValue());
-            }
-            if(cc.getName().equals("adminPassword")){
-                admin.accumulate("password",cc.getValue());
-            }
+        if (cookies == null) {
+            return null;
+        } else {
+            JSONObject admin = new JSONObject();
+            for (Cookie cc : cookies) {
+                if (cc.getName().equals("adminName")) {
+                    admin.accumulate("adminName", cc.getValue());
+                }
+                if (cc.getName().equals("adminPassword")) {
+                    admin.accumulate("password", cc.getValue());
+                }
 
+            }
+            if (admin.size() != 2) {
+                return null;
+            }
+            if (adminService.adminLogin(admin).equals("{\"status\": \"ok\"}")) {
+                return this.adminService.getAllStores();
+            }
+            return null;
         }
-        if(admin.size()!=2){
-            return  null;
-        }
-        if(adminService.adminLogin(admin).equals("{\"status\": \"ok\"}")){
-            return this.adminService.getAllStores();
-        }
-        return  null;
     }
 }
