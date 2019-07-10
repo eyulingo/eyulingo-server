@@ -222,7 +222,7 @@ public class UserServiceImpl implements UserService {
         Timestamp registerdate = new Timestamp(date.getTime());
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Users currentUser = userRepository.findByUserName(userDetails.getUsername());
-        List<CheckCodes> LCode = checkCodeRepository.findByUserEmail(currentUser.getUserEmail());
+        List<CheckCodes> LCode = checkCodeRepository.findByUserEmail(new_email);
         if (LCode.size() != 0) {
             CheckCodes newestCode = LCode.get(0);
             for (CheckCodes code : LCode) {
@@ -242,5 +242,115 @@ public class UserServiceImpl implements UserService {
         else {
             return "{\"status\": \"bad_confirm_code\"}";
         }
+    }
+
+    public JSONObject findPasswordGetCode(JSONObject data){
+        String username = data.getString("username");
+        Users missUser = userRepository.findByUserName(username);
+        if (missUser == null){
+            JSONObject item = new JSONObject();
+            item.accumulate("status","no_such_user");
+            return  item;
+        }
+        else{
+            String email = missUser.getUserEmail();
+            Date now = new Date();
+            Date beforeDate = new Date(now.getTime()-180000);
+            Timestamp getDate = new Timestamp(beforeDate.getTime());
+            JSONObject item = new JSONObject();
+            List<CheckCodes> emalitset = checkCodeRepository.findByUserEmail(email);
+            CheckCodes newestCode = new CheckCodes();
+            if(emalitset.size() !=0 ) {
+                newestCode = emalitset.get(0);
+                for (CheckCodes code : emalitset) {
+                    if (code.getTime().compareTo(newestCode.getTime()) <= 0) {
+                        newestCode = code;
+                    }
+                }
+            }
+            Timestamp lastGetTime = newestCode.getTime();
+            if(!email.matches("\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*"))
+            {
+                item.accumulate("status","bad_email");
+                return item;
+            }
+            else if(emalitset.size() != 0 && lastGetTime.compareTo(getDate) >= 0){
+                item.accumulate("status","Two applications should be three minutes apart ");
+                return item;
+            }
+            else {
+                Date date = new Date();
+                Timestamp nowdate = new Timestamp(date.getTime());
+                String chars = "0123456789";
+                String code = new String();
+                for (int i = 0; i < 6; i++) {
+                    code = chars.charAt((int) (Math.random() * 10)) + code;
+                }
+                CheckCodes checkCodes = new CheckCodes();
+                checkCodes.setUserEmail(email);
+                checkCodes.setCheckCode(code);
+                checkCodes.setTime(nowdate);
+                checkCodeRepository.save(checkCodes);
+                System.out.printf(code);
+                CodeSender vCS = new CodeSender();
+
+                try {
+                    vCS.sendCode(email, code);
+//                item.accumulate("code", code);
+                    item.accumulate("status","ok");
+                    return item;
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    item.accumulate("status", "failed_to_send");
+                    return item;
+                }
+            }
+        }
+    }
+
+    public String findPassword(JSONObject data){
+        String username = data.getString("username");
+        String password = data.getString("new_password");
+        String confirm = data.getString("confirm_password");
+        String confirm_code = data.getString("check_code");
+        Users missUser = userRepository.findByUserName(username);
+        Date now = new Date();
+        Date date = new Date(now.getTime()-180000);
+        Timestamp finddate = new Timestamp(date.getTime());
+        if(!password.matches("^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z_]{8,20}$")){
+            return  "{\"status\": \"bad_form_password\"}";
+        }
+        else if(!password.equals(confirm)){
+            return "{\"status\": \"bad_confirm\"}";
+        }
+        else if (missUser == null){
+            return "{\"status\": \"no_such_user\"}";
+        }
+        else {
+            String email = missUser.getUserEmail();
+            List<CheckCodes> LCode = checkCodeRepository.findByUserEmail(email);
+            if (LCode.size() != 0) {
+                CheckCodes newestCode = LCode.get(0);
+                for (CheckCodes code : LCode) {
+                    if (code.getTime().compareTo(newestCode.getTime()) <= 0) {
+                        newestCode = code;
+                    }
+
+                }
+                if (newestCode.getTime().compareTo(finddate) >= 0 && newestCode.getCheckCode().equals(confirm_code)) {
+                    Users newuser = new Users();
+                    newuser.setPassword(password);
+                    newuser.setUserName(username);
+                    userRepository.save(newuser);
+                    return "{\"status\": \"ok\"}";
+                } else {
+                    return "{\"status\": \"bad_confirm_code\"}";
+                }
+            }
+            else {
+                return "{\"status\": \"not_get_confirm_code\"}";
+            }
+        }
+
     }
 }

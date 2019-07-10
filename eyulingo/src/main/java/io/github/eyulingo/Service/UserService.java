@@ -17,4 +17,8 @@ public interface UserService {
     public String changePassword(JSONObject data);
 
     public String changeEmail(JSONObject data);
+
+    public JSONObject findPasswordGetCode(JSONObject data);
+
+    public String findPassword(JSONObject data);
 }
