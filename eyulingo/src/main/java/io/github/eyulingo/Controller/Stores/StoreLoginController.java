@@ -23,6 +23,8 @@ public class StoreLoginController {
         if(store.equals("{\"status\": \"ok\"}")){
             Cookie ck0 = new Cookie("distName", data.getString("distName"));
             Cookie ck1 = new Cookie("distPassword", data.getString("password"));
+            ck0.setMaxAge(1800);
+            ck1.setMaxAge(1800);
             httpServletResponse.addCookie(ck0);
             httpServletResponse.addCookie(ck1);
             return store;
