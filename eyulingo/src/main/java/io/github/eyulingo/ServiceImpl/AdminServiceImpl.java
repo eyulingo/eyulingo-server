@@ -12,6 +12,7 @@ import io.github.eyulingo.Dao.AdminRepository;
 import io.github.eyulingo.Entity.Admins;
 
 
+import java.sql.Timestamp;
 import java.util.List;
 
 
@@ -115,7 +116,7 @@ public class AdminServiceImpl implements AdminService{
             Stores store = storeRepository.findByStoreId(data.getLong("store_id"));
             String address = data.getString("address");
             if(!address.isEmpty()){
-                store.setStoreName(address);
+                store.setStoreAddress(address);
             }
             String name = data.getString("name");
             if(!name.isEmpty()){
@@ -123,16 +124,16 @@ public class AdminServiceImpl implements AdminService{
             }
             String starttime = data.getString("starttime");
             if(!starttime.isEmpty()){
-                store.setStoreName(starttime);
+                store.setStartTime(starttime);
             }
             String endtime = data.getString("endtime");
             if(!endtime.isEmpty()){
-                store.setStoreName(endtime);
+                store.setEndTime(endtime);
             }
 
             String store_phone_nu = data.getString("store_phone_nu");
             if(!store_phone_nu.isEmpty()){
-                store.setStoreName(store_phone_nu);
+                store.setStorePhone(store_phone_nu);
             }
             storeRepository.save(store);
             return "{\"status\": \"ok\"}";
