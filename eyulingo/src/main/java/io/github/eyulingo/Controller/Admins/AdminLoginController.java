@@ -27,6 +27,7 @@ public class AdminLoginController {
         if(admin.equals("{\"status\": \"ok\"}")){
             Cookie ck0 = new Cookie("adminName", data.getString("adminName") );
             Cookie ck1 = new Cookie("adminPassword", data.getString("password"));
+
             httpServletResponse.addCookie(ck0);
             httpServletResponse.addCookie(ck1);
             return admin;

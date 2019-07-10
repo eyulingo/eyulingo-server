@@ -27,9 +27,23 @@ public class UserServiceImpl implements UserService {
     CheckCodeRepository checkCodeRepository;
 
     public JSONObject getCheckCode(JSONObject data){
+        Date now = new Date();
+        Date beforeDate = new Date(now.getTime()-180000);
+        Timestamp getDate = new Timestamp(beforeDate.getTime());
         String email = data.getString("email");
         JSONObject item = new JSONObject();
         Users usertest = userRepository.findByUserEmail(email);
+        List<CheckCodes> emalitset = checkCodeRepository.findByUserEmail(email);
+        CheckCodes newestCode = new CheckCodes();
+        if(emalitset.size() !=0 ) {
+            newestCode = emalitset.get(0);
+            for (CheckCodes code : emalitset) {
+                if (code.getTime().compareTo(newestCode.getTime()) <= 0) {
+                    newestCode = code;
+                }
+            }
+        }
+        Timestamp lastGetTime = newestCode.getTime();
         if(!email.matches("\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*"))
         {
             item.accumulate("status","bad_email");
@@ -39,6 +53,10 @@ public class UserServiceImpl implements UserService {
             item.accumulate("status","exist email");
             return item;
 
+        }
+        else if(emalitset.size() != 0 && lastGetTime.compareTo(getDate) >= 0){
+            item.accumulate("status","Two applications should be three minutes apart ");
+            return item;
         }
         else {
             Date date = new Date();
@@ -81,11 +99,8 @@ public class UserServiceImpl implements UserService {
         Date now = new Date();
         Date date = new Date(now.getTime()-180000);
         Timestamp registerdate = new Timestamp(date.getTime());
-        if(username.isEmpty()){
-            return  "{\"status\": \"username can't be empty\"}";
-        }
-        else if(password.isEmpty()){
-            return  "{\"status\": \"password can't be empty\"}";
+        if(username.isEmpty() || password.isEmpty() || confirm_code.isEmpty() || confirm_password.isEmpty() || email.isEmpty()){
+            return  "{\"status\": \"Your message can't be empty\"}";
         }
         else if(!password.equals(confirm_password)) {
             return  "{\"status\": \"bad_confirm_password\"}";
@@ -116,15 +131,15 @@ public class UserServiceImpl implements UserService {
                     newuser.setPassword(password);
                     newuser.setUserName(username);
                     newuser.setUserEmail(email);
-                    newuser.setImageId("0");
+                    newuser.setImageId("5d25569d6344590006015f02");
                     userRepository.save(newuser);
                     return "{\"status\": \"ok\"}";
                 } else {
-                    return "{\"status\": \"bad_confirm_code\"}";
+                    return "{\"status\": \"overtime_confirm_code\"}";
                 }
             }
             else {
-                return "{\"status\": \"bad_confirm_code\"}";
+                return "{\"status\": \"not_get_confirm_code\"}";
             }
         }
     }
