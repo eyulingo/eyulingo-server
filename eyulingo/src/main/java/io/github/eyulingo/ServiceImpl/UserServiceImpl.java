@@ -102,6 +102,9 @@ public class UserServiceImpl implements UserService {
         if(username.isEmpty() || password.isEmpty() || confirm_code.isEmpty() || confirm_password.isEmpty() || email.isEmpty()){
             return  "{\"status\": \"Your message can't be empty\"}";
         }
+        else if(!password.matches("^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z_]{8,20}$")){
+            return  "{\"status\": \"bad_form_password\"}";
+        }
         else if(!password.equals(confirm_password)) {
             return  "{\"status\": \"bad_confirm_password\"}";
         }
@@ -135,7 +138,7 @@ public class UserServiceImpl implements UserService {
                     userRepository.save(newuser);
                     return "{\"status\": \"ok\"}";
                 } else {
-                    return "{\"status\": \"overtime_confirm_code\"}";
+                    return "{\"status\": \"bad_confirm_code\"}";
                 }
             }
             else {
@@ -184,9 +187,12 @@ public class UserServiceImpl implements UserService {
             if(data.getString("new_password").isEmpty() || data.getString("origin_password").isEmpty() || data.getString("confirm_new_password").isEmpty()){
                 return "{\"status\": \"password can't be empty\"}";
             }
+            if(!data.getString("new_password").matches("^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z_]{8,20}$")){
+                return  "{\"status\": \"bad_form_password\"}";
+            }
             if(data.getString("origin_password").equals(currentUser.getPassword())){
                 if(data.getString("new_password").equals(data.getString("confirm_new_password"))){
-                    if(!data.getString("new_password").equals(data.getString("origin_password"))){
+                    if(data.getString("new_password").equals(data.getString("origin_password"))){
                         return "{\"status\": \"origin_name is same with new_password\"}";
                     }
                     else {

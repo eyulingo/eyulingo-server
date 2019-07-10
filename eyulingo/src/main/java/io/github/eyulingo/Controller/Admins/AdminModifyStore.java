@@ -18,24 +18,28 @@ public class AdminModifyStore {
     @RequestMapping(value = "/admin/modifystore",method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     public
     @ResponseBody
-    String adminModitifyStores(@RequestBody JSONObject data, HttpServletRequest httpRequest){
+    String adminModitifyStores(@RequestBody JSONObject data, HttpServletRequest httpRequest) {
         Cookie[] cookies = httpRequest.getCookies();
-        JSONObject admin =new JSONObject();
-        for (Cookie cc:cookies){
-            if (cc.getName().equals("adminName")){
-                admin.accumulate("adminName",cc.getValue());
-            }
-            if(cc.getName().equals("adminPassword")){
-                admin.accumulate("password",cc.getValue());
-            }
+        if (cookies == null) {
+            return "{\"status\": \"not login as admin\"}";
+        } else {
+            JSONObject admin = new JSONObject();
+            for (Cookie cc : cookies) {
+                if (cc.getName().equals("adminName")) {
+                    admin.accumulate("adminName", cc.getValue());
+                }
+                if (cc.getName().equals("adminPassword")) {
+                    admin.accumulate("password", cc.getValue());
+                }
 
+            }
+            if (admin.size() != 2) {
+                return "{\"status\": \"not login as admin\"}";
+            }
+            if (adminService.adminLogin(admin).equals("{\"status\": \"ok\"}")) {
+                return this.adminService.modifyStores(data);
+            }
+            return "{\"status\": \"wrong\"}";
         }
-        if(admin.size()!=2){
-            return  "{\"status\": \"not login as admin\"}";
-        }
-        if(adminService.adminLogin(admin).equals("{\"status\": \"ok\"}")){
-            return this.adminService.modifyStores(data);
-        }
-        return  "{\"status\": \"wrong\"}";
     }
 }

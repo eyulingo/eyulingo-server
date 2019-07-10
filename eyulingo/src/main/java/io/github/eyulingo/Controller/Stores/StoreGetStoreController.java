@@ -20,33 +20,39 @@ public class StoreGetStoreController {
     @RequestMapping(value = "/store/mystoreinfo",method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
     public
     @ResponseBody
-    JSONObject storeGetStore(HttpServletRequest httpRequest){
+    JSONObject storeGetStore(HttpServletRequest httpRequest) {
         Cookie[] cookies = httpRequest.getCookies();
-        JSONObject store =new JSONObject();
-        for (Cookie cc:cookies){
-            if (cc.getName().equals("distName")){
-                store.accumulate("distName",cc.getValue());
-                break;
-            }
-
-        }
-        for (Cookie cc:cookies) {
-            if (cc.getName().equals("distPassword")) {
-                store.accumulate("password", cc.getValue());
-                break;
-            }
-        }
-        if(store.size()!=2){
+        if (cookies == null) {
             JSONObject item = new JSONObject();
-            item.accumulate("status","not login");
-            return  item;
-        }
-        if(storeService.distLogin(store).equals("{\"status\": \"ok\"}")){
-            return this.storeService.getMyStore(store.getString("distName"));
-        }
-        JSONObject item = new JSONObject();
-        item.accumulate("status","not login");
-        return  item;
+            item.accumulate("status", "not login");
+            return item;
+        } else {
+            JSONObject store = new JSONObject();
+            for (Cookie cc : cookies) {
+                if (cc.getName().equals("distName")) {
+                    store.accumulate("distName", cc.getValue());
+                    break;
+                }
 
+            }
+            for (Cookie cc : cookies) {
+                if (cc.getName().equals("distPassword")) {
+                    store.accumulate("password", cc.getValue());
+                    break;
+                }
+            }
+            if (store.size() != 2) {
+                JSONObject item = new JSONObject();
+                item.accumulate("status", "not login");
+                return item;
+            }
+            if (storeService.distLogin(store).equals("{\"status\": \"ok\"}")) {
+                return this.storeService.getMyStore(store.getString("distName"));
+            }
+            JSONObject item = new JSONObject();
+            item.accumulate("status", "not login");
+            return item;
+
+        }
     }
 }
