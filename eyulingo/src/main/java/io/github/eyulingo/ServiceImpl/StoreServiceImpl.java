@@ -201,6 +201,4 @@ public class StoreServiceImpl implements StoreService {
         storeRepository.save(store);
         return  "{\"status\": \"ok\"}";
     }
-
-
 }

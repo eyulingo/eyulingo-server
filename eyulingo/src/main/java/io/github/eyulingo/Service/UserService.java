@@ -27,4 +27,6 @@ public interface UserService {
     public String addAddress(JSONObject data);
 
     public String removeAddress(JSONObject data);
+
+    public String changeAddress(JSONObject data);
 }
