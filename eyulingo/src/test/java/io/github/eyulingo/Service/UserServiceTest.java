@@ -25,21 +25,7 @@ public class UserServiceTest {
         JSONObject data= new JSONObject();
         data.accumulate("email","1217286706@qq.com");
         JSONObject item = new JSONObject();
-
-        item.accumulate("status","Two applications should be three minutes apart");
-        assertEquals(item, userService.getCheckCode(data));
-    }
-
-    @Test
-    public void getCheckCodeTwiceTest(){
-        JSONObject data= new JSONObject();
-        data.accumulate("email","1217286706@qq.com");
-        JSONObject item = new JSONObject();
         item.accumulate("status","ok");
         assertEquals(item, userService.getCheckCode(data));
     }
-
-
-
-
 }
