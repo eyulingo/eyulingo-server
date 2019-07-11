@@ -59,7 +59,7 @@ public class UserServiceImpl implements UserService {
 
         }
         else if(emalitset.size() != 0 && lastGetTime.compareTo(getDate) >= 0){
-            item.accumulate("status","Two applications should be three minutes apart ");
+            item.accumulate("status","Two applications should be three minutes apart");
             return item;
         }
         else {
@@ -412,5 +412,32 @@ public class UserServiceImpl implements UserService {
             }
         }
         return "{\"status\": \"no such address\"}";
+    }
+
+    public String changeAddress(JSONObject data){
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Users currentUser = userRepository.findByUserName(userDetails.getUsername());
+        String name = data.getString("new_receive_name");
+        String phone = data.getString("new_receive_phone");
+        String new_address = data.getString("new_receive_address");
+        String remove_name = data.getString("old_receive_name");
+        String remove_phone = data.getString("old_receive_phone");
+        String remove_address = data.getString("old_receive_address");
+        List<UserAddress> addressList = userAddressRepository.findByUserId(currentUser.getUserId()) ;
+        for(UserAddress old_address:addressList){
+            if(old_address.getReceiverAddress().equals(new_address) && old_address.getReceiverName().equals(name) && old_address.getRecevierPhone().equals(phone)){
+                return "{\"status\": \"exist address\"}";
+            }
+            if(old_address.getReceiverAddress().equals(remove_address) && old_address.getReceiverName().equals(remove_name) && old_address.getRecevierPhone().equals(remove_phone)){
+                userAddressRepository.delete(old_address);
+            }
+        }
+        UserAddress userAddress = new UserAddress();
+        userAddress.setUserId(currentUser.getUserId());
+        userAddress.setRecevierPhone(phone);
+        userAddress.setReceiverAddress(new_address);
+        userAddress.setReceiverName(name);
+        userAddressRepository.save(userAddress);
+        return "{\"status\": \"ok\"}";
     }
 }
