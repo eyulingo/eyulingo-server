@@ -397,4 +397,20 @@ public class UserServiceImpl implements UserService {
         userAddressRepository.save(userAddress);
         return "{\"status\": \"ok\"}";
     }
+
+    public String removeAddress(JSONObject data){
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Users currentUser = userRepository.findByUserName(userDetails.getUsername());
+        String name = data.getString("receive_name");
+        String phone = data.getString("receive_phone");
+        String new_address = data.getString("receive_address");
+        List<UserAddress> addressList = userAddressRepository.findByUserId(currentUser.getUserId()) ;
+        for(UserAddress old_address:addressList){
+            if(old_address.getReceiverAddress().equals(new_address) && old_address.getReceiverName().equals(name) && old_address.getRecevierPhone().equals(phone)){
+                userAddressRepository.delete(old_address);
+                return "{\"status\": \"ok\"}";
+            }
+        }
+        return "{\"status\": \"no such address\"}";
+    }
 }

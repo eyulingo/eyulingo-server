@@ -25,4 +25,6 @@ public interface UserService {
     public JSONObject getMyAddress();
 
     public String addAddress(JSONObject data);
+
+    public String removeAddress(JSONObject data);
 }
