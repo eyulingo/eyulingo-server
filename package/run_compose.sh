@@ -9,7 +9,7 @@ docker-compose stop
 echo "[*] stopped docker-compose images"
 
 echo "[ ] removing docker-compose images ... "
-docker-compose rm | echo y
+echo y | docker-compose rm
 echo "[*] removed docker-compose images"
 
 echo "[ ] starting docker-compose images ... "
