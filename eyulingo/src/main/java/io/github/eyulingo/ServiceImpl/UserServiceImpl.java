@@ -363,13 +363,54 @@ public class UserServiceImpl implements UserService {
         JSONArray addresses =new JSONArray();
         for(UserAddress address:addressList){
             JSONObject addressitem = new JSONObject();
-            addressitem.accumulate("receiver_name",address.getReceiverName());
-            addressitem.accumulate("receiver_phone",address.getRecevierPhone());
-            addressitem.accumulate("receiver_address", address.getReceiverAddress());
+            addressitem.accumulate("receive_name",address.getReceiverName());
+            addressitem.accumulate("receive_phone",address.getRecevierPhone());
+            addressitem.accumulate("receive_address", address.getReceiverAddress());
             addresses.add(addressitem);
         }
         item.accumulate("values",addresses);
         item.accumulate("status","ok");
         return item;
+    }
+
+
+    public String addAddress(JSONObject data) {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Users currentUser = userRepository.findByUserName(userDetails.getUsername());
+        String name = data.getString("receive_name");
+        String phone = data.getString("receive_phone");
+        String new_address = data.getString("receive_address");
+        if(name.isEmpty() || phone.isEmpty() || new_address.isEmpty()){
+            return "{\"status\": \"address can't have empty part\"}";
+        }
+        List<UserAddress> addressList = userAddressRepository.findByUserId(currentUser.getUserId()) ;
+        for(UserAddress old_address:addressList){
+            if(old_address.getReceiverAddress().equals(new_address) && old_address.getReceiverName().equals(name) && old_address.getRecevierPhone().equals(phone)){
+                return "{\"status\": \"added address\"}";
+            }
+        }
+        UserAddress userAddress = new UserAddress();
+        userAddress.setUserId(currentUser.getUserId());
+        userAddress.setRecevierPhone(phone);
+        userAddress.setReceiverAddress(new_address);
+        userAddress.setReceiverName(name);
+        userAddressRepository.save(userAddress);
+        return "{\"status\": \"ok\"}";
+    }
+
+    public String removeAddress(JSONObject data){
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Users currentUser = userRepository.findByUserName(userDetails.getUsername());
+        String name = data.getString("receive_name");
+        String phone = data.getString("receive_phone");
+        String new_address = data.getString("receive_address");
+        List<UserAddress> addressList = userAddressRepository.findByUserId(currentUser.getUserId()) ;
+        for(UserAddress old_address:addressList){
+            if(old_address.getReceiverAddress().equals(new_address) && old_address.getReceiverName().equals(name) && old_address.getRecevierPhone().equals(phone)){
+                userAddressRepository.delete(old_address);
+                return "{\"status\": \"ok\"}";
+            }
+        }
+        return "{\"status\": \"no such address\"}";
     }
 }

@@ -23,4 +23,8 @@ public interface UserService {
     public String findPassword(JSONObject data);
 
     public JSONObject getMyAddress();
+
+    public String addAddress(JSONObject data);
+
+    public String removeAddress(JSONObject data);
 }
