@@ -21,4 +21,6 @@ public interface UserService {
     public JSONObject findPasswordGetCode(JSONObject data);
 
     public String findPassword(JSONObject data);
+
+    public JSONObject getMyAddress();
 }

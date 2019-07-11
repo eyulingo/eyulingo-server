@@ -25,11 +25,12 @@ public class StoreLoginController {
             Cookie ck1 = new Cookie("distPassword", data.getString("password"));
             ck0.setMaxAge(1800);
             ck1.setMaxAge(1800);
+            ck0.setPath("/");
+            ck1.setPath("/");
             httpServletResponse.addCookie(ck0);
             httpServletResponse.addCookie(ck1);
             return store;
         }
         return store;
     }
-
 }

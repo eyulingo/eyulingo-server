@@ -30,7 +30,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity webSecurity) throws Exception {
 
-        webSecurity.ignoring().antMatchers("/store/**", "/admin/**");
+        webSecurity.ignoring().antMatchers("/store/**", "/admin/**", "/js/**", "/css/**");
 
     }
 
@@ -40,7 +40,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-                .authorizeRequests().antMatchers("/store/**", "/admin/**","/img/download", "/img/upload", "/login", "/failure", "/ok","/register","/getcode","/findpassword","/findcheckcode").permitAll()
+                .authorizeRequests().antMatchers("/store/**", "/admin/**","/img/download", "/img/upload", "/login", "/failure", "/ok","/register","/getcode","/findpassword","/findcheckcode", "/index.html", "/index").permitAll()
                 // 对于网站部分资源需要指定鉴权
 //             .antMatchers("/admin/**").hasRole("R_ADMIN")
                 // 除上面外的所有请求全部需要鉴权认证

@@ -1,11 +1,12 @@
 package io.github.eyulingo.ServiceImpl;
 
 import io.github.eyulingo.Dao.CheckCodeRepository;
+import io.github.eyulingo.Dao.UserAddressRepository;
 import io.github.eyulingo.Dao.UserRepository;
-import io.github.eyulingo.Entity.CheckCodes;
-import io.github.eyulingo.Entity.Users;
+import io.github.eyulingo.Entity.*;
 import io.github.eyulingo.Service.UserService;
 import io.github.eyulingo.Utilities.CodeSender;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,6 +26,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     CheckCodeRepository checkCodeRepository;
+
+    @Autowired
+    UserAddressRepository userAddressRepository;
 
     public JSONObject getCheckCode(JSONObject data){
         Date now = new Date();
@@ -349,5 +353,23 @@ public class UserServiceImpl implements UserService {
             }
         }
 
+    }
+
+    public JSONObject getMyAddress(){
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Users currentUser = userRepository.findByUserName(userDetails.getUsername());
+        JSONObject item = new JSONObject();
+        List<UserAddress> addressList = userAddressRepository.findByUserId(currentUser.getUserId()) ;
+        JSONArray addresses =new JSONArray();
+        for(UserAddress address:addressList){
+            JSONObject addressitem = new JSONObject();
+            addressitem.accumulate("receiver_name",address.getReceiverName());
+            addressitem.accumulate("receiver_phone",address.getRecevierPhone());
+            addressitem.accumulate("receiver_address", address.getReceiverAddress());
+            addresses.add(addressitem);
+        }
+        item.accumulate("values",addresses);
+        item.accumulate("status","ok");
+        return item;
     }
 }

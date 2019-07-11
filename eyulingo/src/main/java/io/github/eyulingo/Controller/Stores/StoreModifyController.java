@@ -4,17 +4,19 @@ import io.github.eyulingo.Service.StoreService;
 import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import java.io.UnsupportedEncodingException;
-
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.UnsupportedEncodingException;
 
 
 @RestController
-public class StoreChangeDistImageController {
+public class StoreModifyController {
+
     @Autowired
     private StoreService storeService;
+
 
     public static String getEncoding(String str) {
         String encode = "GB2312";
@@ -52,6 +54,7 @@ public class StoreChangeDistImageController {
         return "gg";
     }
 
+
     public static String convertEncodingFormat(String str, String formatFrom, String FormatTo) {
         String result = null;
         if (!(str == null || str.length() == 0)) {
@@ -63,15 +66,14 @@ public class StoreChangeDistImageController {
         }
         return result;
     }
-    @RequestMapping(value = "/store/avatar",method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-    public
+
+    @RequestMapping(value = "/store/modifystoreinfo",method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     @ResponseBody
-    String userChangeImage(HttpServletRequest httpRequest,@RequestBody JSONObject data){
+    public String adminModifyDist(@RequestBody JSONObject data, HttpServletRequest httpRequest, HttpServletResponse httpServletResponse) {
         Cookie[] cookies = httpRequest.getCookies();
         if (cookies == null) {
             return "{\"status\": \"not login in\"}";
-        }
-        else{
+        } else {
             JSONObject store = new JSONObject();
             for (Cookie cc : cookies) {
                 if (cc.getName().equals("distName")) {
@@ -98,11 +100,13 @@ public class StoreChangeDistImageController {
                 return "{\"status\": \"not login in\"}";
             }
             if (storeService.distLogin(store).equals("{\"status\": \"ok\"}")) {
-                return this.storeService.ChangeDistImage(store.getString("distName"), data);
-            } else {
-                return "{\"status\": \"not login\"}";
+                String isright = this.storeService.changeMyStore(data,store.getString("distName"));
+                if (isright.equals("{\"status\": \"ok\"}")) {
+                    return isright;
+                }
+                return isright;
             }
+            return "{\"status\": \"not login \"}";
         }
-
     }
 }
