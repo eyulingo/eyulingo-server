@@ -20,7 +20,7 @@ public class Users implements UserDetails {
     @Id
     @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer userId;
+    private Long userId;
 
     @Column(name = "user_name")
     private String userName;
@@ -35,7 +35,7 @@ public class Users implements UserDetails {
     private String imageId;
 
 
-    public void setUserId(Integer userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 
@@ -43,7 +43,7 @@ public class Users implements UserDetails {
         this.password = password;
     }
 
-    public Integer getUserId() {
+    public Long getUserId() {
         return userId;
     }
 

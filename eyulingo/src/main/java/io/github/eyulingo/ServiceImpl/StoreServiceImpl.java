@@ -178,4 +178,29 @@ public class StoreServiceImpl implements StoreService {
             storeRepository.save(store);
             return "{\"status\": \"ok\"}";
     }
+
+
+
+    public String changeMyStore(JSONObject data,String name){
+        Stores store = storeRepository.findByDistName(name);
+        if(!data.getString("name").isEmpty()){
+            store.setStoreName(data.getString("name"));
+        }
+        if(!data.getString("address").isEmpty()){
+            store.setStoreAddress(data.getString("address"));
+        }
+        if(!data.getString("starttime").isEmpty()){
+            store.setStartTime(data.getString("starttime"));
+        }
+        if(!data.getString("endtime").isEmpty()){
+            store.setEndTime(data.getString("endtime"));
+        }
+        if(!data.getString("phone_nu").isEmpty()){
+            store.setStorePhone(data.getString("phone_nu"));
+        }
+        storeRepository.save(store);
+        return  "{\"status\": \"ok\"}";
+    }
+
+
 }

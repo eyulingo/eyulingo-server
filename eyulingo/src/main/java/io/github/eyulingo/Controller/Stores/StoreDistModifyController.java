@@ -19,6 +19,41 @@ public class StoreDistModifyController {
 
     @Autowired
     private StoreService storeService;
+    public static String getEncoding(String str) {
+        String encode = "GB2312";
+        try {
+            if (str.equals(new String(str.getBytes(encode), encode))) { //判断是不是GB2312
+                String s = encode;
+                return s; //是的话，返回“GB2312“，以下代码同理
+            }
+        } catch (Exception exception) {
+        }
+        encode = "ISO-8859-1";
+        try {
+            if (str.equals(new String(str.getBytes(encode), encode))) { //判断是不是ISO-8859-1
+                String s1 = encode;
+                return s1;
+            }
+        } catch (Exception exception1) {
+        }
+        encode = "UTF-8";
+        try {
+            if (str.equals(new String(str.getBytes(encode), encode))) { //判断是不是UTF-8
+                String s2 = encode;
+                return s2;
+            }
+        } catch (Exception exception2) {
+        }
+        encode = "GBK";
+        try {
+            if (str.equals(new String(str.getBytes(encode), encode))) { //判断是不是GBK
+                String s3 = encode;
+                return s3;
+            }
+        } catch (Exception exception3) {
+        }
+        return "gg";
+    }
 
     public static String convertEncodingFormat(String str, String formatFrom, String FormatTo) {
         String result = null;
@@ -34,7 +69,7 @@ public class StoreDistModifyController {
 
     @RequestMapping(value = "/store/modifydist",method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     @ResponseBody
-    public String adminModifyDist(@RequestBody JSONObject data, HttpServletRequest httpRequest, HttpServletResponse httpServletResponse) {
+    public String adminModifyDist(@RequestBody JSONObject data, HttpServletRequest httpRequest, HttpServletResponse httpServletResponse) throws UnsupportedEncodingException {
         Cookie[] cookies = httpRequest.getCookies();
         if (cookies == null) {
             return "{\"status\": \"not login in\"}";
@@ -42,9 +77,17 @@ public class StoreDistModifyController {
             JSONObject store = new JSONObject();
             for (Cookie cc : cookies) {
                 if (cc.getName().equals("distName")) {
-                    String name = convertEncodingFormat(cc.getValue(), "iso-8859-1", "UTF-8");
-                    store.accumulate("distName", name);
-                    break;
+                    String encode = getEncoding(cc.getValue());
+                    System.out.printf(encode);
+                    if(encode == "UTF-8"  || encode == "GB2312") {
+                        store.accumulate("distName", cc.getValue());
+                        break;
+                    }
+                    else{
+                        String name = convertEncodingFormat(cc.getValue(), encode, "UTF-8");
+                        store.accumulate("distName", name);
+                        break;
+                    }
                 }
             }
             for (Cookie cc : cookies) {
