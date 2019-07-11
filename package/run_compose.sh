@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+echo "[ ] removing web repo ... "
+rm -rf eyulingo-web
+echo "[x] removed. "
+
 echo "[ ] stopping docker-compose images ... "
 docker-compose stop
 echo "[*] stopped docker-compose images"
@@ -34,3 +38,8 @@ echo "[x] successfully built distributor page "
 
 echo "[ ] starting docker-compose images ... "
 docker-compose up
+echo "[x] stopped docker-compose images "
+
+echo "[ ] removing web repo ... "
+rm -rf eyulingo-web
+echo "[x] removed. "
