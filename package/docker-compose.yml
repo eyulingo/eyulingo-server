@@ -29,7 +29,7 @@ services:
     restart: always
 
   admin:
-    image: nginx
+    image: nginx:1.11.6-alpine
     container_name: admin-page
     ports:
       - "8081:8081"
@@ -37,7 +37,7 @@ services:
       - ./eyulingo-web/eyulingo-admin/dist:/usr/share/nginx/html
 
   dist:
-    image: nginx
+    image: nginx:1.11.6-alpine
     container_name: dist-page
     ports:
       - "8082:8082"
