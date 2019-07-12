@@ -1,27 +1,16 @@
-package io.github.eyulingo.MongoDB
+package io.github.eyulingo.Utilities
 
-
-import com.mongodb.Mongo
-import com.mongodb.MongoClient
-import com.mongodb.MongoClientURI
-import com.mongodb.gridfs.GridFS
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.ClassPathResource
+import org.springframework.mail.javamail.JavaMailSenderImpl
 import java.util.*
 
 
 @Configuration
-open class MongoDBConfig {
-
+open class MailConfiguration {
     @Bean
-    open fun gridFS(): GridFS {
-        return GridFS(mongo().getDB("eyulingo_imgs"))
-    }
-
-    @Bean
-    open fun mongo(): Mongo {
-
+    open fun JavaMailSender(): JavaMailSenderImpl {
         // create file input stream object for the properties file
         val fis = ClassPathResource(
                 "application.properties").inputStream
@@ -30,8 +19,13 @@ open class MongoDBConfig {
         // load the properties file
         prop.load(fis)
         // get the property of "url" using getProperty()
-        val uri = prop.getProperty("spring.data.mongodb.uri")
 
-        return MongoClient(MongoClientURI(uri))
+        val mailSender = JavaMailSenderImpl()
+        mailSender.host = prop.getProperty("spring.mail.host")
+        mailSender.port = prop.getProperty("spring.mail.port").toInt()
+        mailSender.username = prop.getProperty("spring.mail.username")
+        mailSender.password = prop.getProperty("spring.mail.password")
+
+        return mailSender
     }
 }
