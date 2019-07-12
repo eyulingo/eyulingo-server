@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 @Table(name = "orderitems")
 public class OrderItems implements Serializable {
     @Id
-    @Column(name = "store_id")
+    @Column(name = "order_id")
     private Long storeId;
 
     @Id
