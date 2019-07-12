@@ -28,8 +28,11 @@ class CodeSender {
                 "    <title>Eyulingo 验证邮件</title>\n" +
                 "</head>\n" +
                 "<body>\n" +
-                "    <h1>感谢您注册 Eyulingo！</h1>\n" +
-                "    <h3>此封邮件用于确认您的电子邮件地址是否有效。<br>您的验证码是：</h3>\n" +
+                "    <h1>感谢您使用 Eyulingo！</h1>\n" +
+                "    <h3>此封邮件用于确认您的电子邮件地址。" +
+                "<br>" +
+                "<h3>您的受信邮箱是：" + to + "</h3>" +
+                "<br>您的验证码是：</h3>\n" +
                 "    <h2>" + code + "</h2>\n" +
                 "    <h3>谢谢！</h3>\n" +
                 "    <h3>Eyulingo 敬上</h3>\n" +
