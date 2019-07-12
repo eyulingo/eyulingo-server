@@ -40,6 +40,6 @@ echo "[ ] starting docker-compose images ... "
 docker-compose up
 echo "[x] stopped docker-compose images "
 
-echo "[ ] removing web repo ... "
-rm -rf eyulingo-web
-echo "[x] removed. "
+# echo "[ ] removing web repo ... "
+# rm -rf eyulingo-web
+# echo "[x] removed. "

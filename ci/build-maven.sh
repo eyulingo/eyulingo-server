@@ -1,11 +1,13 @@
 #!/usr/bin/env bash 
 
+yum install maven
+
 echo "Starting eyulingo-android Unit Tests"
 
 # Put unit test code here
 # 
 
-./eyulingo/mvnw clean compile package install -DskipTests=true -Dmaven.javadoc.skip=true -Dgpg.skip=true
+./eyulingo/mvnw clean install -DskipTests=true
 
 ./eyulingo/mvnw test
 

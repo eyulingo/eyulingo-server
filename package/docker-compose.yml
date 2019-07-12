@@ -28,18 +28,26 @@ services:
     container_name: server
     restart: always
 
-  # admin:
-  #   image: nginx:1.11.6-alpine
-  #   container_name: admin-page
-  #   ports:
-  #     - "8081:8081"
-  #   volumes:
-  #     - ./eyulingo-web/eyulingo-admin/dist:/usr/share/nginx/html
+  admin-panel:
+    image: yuxiqian/eyulingo-admin:latest
+    ports:
+      - "8081:8081"
+    links:
+      - mysqldb
+    depends_on:
+      mysqldb:
+        condition: service_healthy
+    container_name: admin-panel
+    restart: always
 
-  # dist:
-  #   image: nginx:1.11.6-alpine
-  #   container_name: dist-page
-  #   ports:
-  #     - "8082:8082"
-  #   volumes:
-  #     - ./eyulingo-web/eyulingo-admin/dist:/usr/share/nginx/html
+  dist-panel:
+    image: yuxiqian/eyulingo-dist:latest
+    ports:
+      - "8082:8082"
+    links:
+      - mysqldb
+    depends_on:
+      mysqldb:
+        condition: service_healthy
+    container_name: dist-panel
+    restart: always
