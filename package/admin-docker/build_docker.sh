@@ -4,7 +4,7 @@ cd ../../eyulingo-admin
 
 ./mvnw clean package -DskipTests
 
-mv target/eyulingo-admin-0.0.1-SNAPSHOT.jar ../package/admin-docker/app.jar
+mv target/eyulingo-0.0.1-SNAPSHOT.jar ../package/admin-docker/app.jar
 
 cd ../package/admin-docker
 

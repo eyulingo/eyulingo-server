@@ -4,7 +4,7 @@ cd ../../eyulingo-store
 
 ./mvnw clean package -DskipTests
 
-mv target/eyulingo-store-0.0.1-SNAPSHOT.jar ../package/dist-docker/app.jar
+mv target/eyulingo-0.0.1-SNAPSHOT.jar ../package/dist-docker/app.jar
 
 cd ../package/dist-docker
 
