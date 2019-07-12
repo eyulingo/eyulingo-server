@@ -49,35 +49,30 @@ public class StoreServiceImpl implements StoreService {
         item.accumulate("store_id", store.getStoreId());
 
         String location = store.getDistLocation();
-        if (!location.isEmpty()) {
-            item.accumulate("location", location);
-        }
+        item.accumulate("location", location);
+
 
         String truename = store.getDistName();
-        if (!truename.isEmpty()) {
             item.accumulate("truename", truename);
-        }
+
 
         String dist_phone_nu = store.getDistPhone();
-        if (!dist_phone_nu.isEmpty()) {
-            item.accumulate("dist_phone_nu", dist_phone_nu);
-        }
+        item.accumulate("dist_phone_nu", dist_phone_nu);
+
 
         String password = store.getDistPassword();
-        if (!dist_phone_nu.isEmpty()) {
-            item.accumulate("password", password);
-        }
+        item.accumulate("password", password);
+
 
         String dist_image_id = store.getDistImageId();
-        if (!dist_image_id.isEmpty()) {
-            item.accumulate("dist_image_id", dist_image_id);
-        }
+
+        item.accumulate("dist_image_id", dist_image_id);
+
 
         return item;
     }
 
     public String modifyDist(String name,JSONObject data) {
-
         try {
             System.out.println(data);
             Stores store = storeRepository.findByDistName(name);
