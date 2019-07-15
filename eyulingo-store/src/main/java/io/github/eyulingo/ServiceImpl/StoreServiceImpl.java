@@ -1,9 +1,11 @@
 package io.github.eyulingo.ServiceImpl;
 
 
+import io.github.eyulingo.Dao.DeliversRepository;
 import io.github.eyulingo.Dao.StoreCommentsRepository;
 import io.github.eyulingo.Dao.StoreRepository;
 import io.github.eyulingo.Dao.UserRepository;
+import io.github.eyulingo.Entity.Delivers;
 import io.github.eyulingo.Entity.StoreComments;
 import io.github.eyulingo.Entity.Stores;
 import io.github.eyulingo.Service.StoreService;
@@ -27,6 +29,9 @@ public class StoreServiceImpl implements StoreService {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    DeliversRepository deliversRepository;
 
     public String distLogin(JSONObject data) {
         try {
@@ -199,5 +204,43 @@ public class StoreServiceImpl implements StoreService {
         }
         storeRepository.save(store);
         return  "{\"status\": \"ok\"}";
+    }
+
+
+    public String changeStoreImage(JSONObject data){
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Stores store = storeRepository.findByDistName(userDetails.getUsername());
+        store.setCoverId(data.getString("image_id"));
+        storeRepository.save(store);
+        return "{\"status\": \"ok\"}";
+    }
+
+
+    public JSONObject getDeliver(){
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Stores store = storeRepository.findByDistName(userDetails.getUsername());
+        JSONObject item = new JSONObject();
+        item.accumulate("delivery_method",store.getDeliverMethod());
+        item.accumulate("status","ok");
+        return item;
+    }
+
+    public String setDeliver(JSONObject data){
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Stores store = storeRepository.findByDistName(userDetails.getUsername());
+        store.setDeliverMethod(data.getString("delivery"));
+        storeRepository.save(store);
+        return "{\"status\": \"ok\"}";
+    }
+
+    public JSONArray getAllDeliver(){
+        List<Delivers> delivers = deliversRepository.findAll();
+        JSONArray item = new JSONArray();
+        for(Delivers Deliver:delivers){
+            JSONObject data = new JSONObject();
+            data.accumulate("delivery_method",Deliver.getDeliverName());
+            item.add(data);
+        }
+        return item;
     }
 }

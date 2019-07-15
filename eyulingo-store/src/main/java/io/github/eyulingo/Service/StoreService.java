@@ -5,7 +5,6 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 public interface StoreService {
-    public  String distLogin(JSONObject data);
 
     public JSONObject getDist();
 
@@ -16,4 +15,12 @@ public interface StoreService {
     public  String ChangeDistImage(JSONObject data);
 
     public String changeMyStore(JSONObject data);
+
+    public String changeStoreImage(JSONObject data);
+
+    public JSONObject getDeliver();
+
+    public  String setDeliver(JSONObject data);
+
+    public JSONArray getAllDeliver();
 }
