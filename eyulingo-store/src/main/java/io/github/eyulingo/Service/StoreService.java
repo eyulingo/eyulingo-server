@@ -23,4 +23,14 @@ public interface StoreService {
     public  String setDeliver(JSONObject data);
 
     public JSONArray getAllDeliver();
+
+    public JSONObject getGoods();
+
+    public String modifyGoods(JSONObject data);
+
+    public String addGood(JSONObject data);
+
+    public String addTag(JSONObject data);
+
+    public String deleteTag(JSONObject data);
 }

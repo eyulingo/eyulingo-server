@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 @Table(name="goods")
 public class Goods {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "good_id")
     private Long goodId;
 
@@ -15,7 +15,7 @@ public class Goods {
     private String goodName;
 
     @Column(name = "store_id")
-    private String storeId;
+    private Long storeId;
 
     @Column(name = "price")
     private BigDecimal price;
@@ -24,7 +24,7 @@ public class Goods {
     private BigDecimal discount;
 
     @Column(name = "storage")
-    private String storage;
+    private Long storage;
 
     @Column(name = "description")
     private String description;
@@ -38,7 +38,7 @@ public class Goods {
     public Goods(){
 
     }
-    public void setStorage(String storage) {
+    public void setStorage(Long storage) {
         this.storage = storage;
     }
 
@@ -58,7 +58,7 @@ public class Goods {
         this.description = description;
     }
 
-    public String getStorage() {
+    public Long getStorage() {
         return storage;
     }
 
@@ -86,7 +86,7 @@ public class Goods {
         this.goodId = goodId;
     }
 
-    public String getStoreId() {
+    public Long getStoreId() {
         return storeId;
     }
 
@@ -98,7 +98,7 @@ public class Goods {
         this.goodName = goodName;
     }
 
-    public void setStoreId(String storeId) {
+    public void setStoreId(Long storeId) {
         this.storeId = storeId;
     }
 
