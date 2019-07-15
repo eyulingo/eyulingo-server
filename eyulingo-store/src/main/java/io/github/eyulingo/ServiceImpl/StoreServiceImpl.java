@@ -1,13 +1,8 @@
 package io.github.eyulingo.ServiceImpl;
 
 
-import io.github.eyulingo.Dao.DeliversRepository;
-import io.github.eyulingo.Dao.StoreCommentsRepository;
-import io.github.eyulingo.Dao.StoreRepository;
-import io.github.eyulingo.Dao.UserRepository;
-import io.github.eyulingo.Entity.Delivers;
-import io.github.eyulingo.Entity.StoreComments;
-import io.github.eyulingo.Entity.Stores;
+import io.github.eyulingo.Dao.*;
+import io.github.eyulingo.Entity.*;
 import io.github.eyulingo.Service.StoreService;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -15,8 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import io.github.eyulingo.Entity.Users;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -32,6 +28,12 @@ public class StoreServiceImpl implements StoreService {
 
     @Autowired
     DeliversRepository deliversRepository;
+
+    @Autowired
+    GoodsRepository goodsRepository;
+
+    @Autowired
+    TagsRepository tagsRepository;
 
     public String distLogin(JSONObject data) {
         try {
@@ -75,6 +77,8 @@ public class StoreServiceImpl implements StoreService {
         String dist_image_id = store.getDistImageId();
 
         item.accumulate("dist_image_id", dist_image_id);
+
+        item.accumulate("status","ok");
 
 
         return item;
@@ -170,6 +174,7 @@ public class StoreServiceImpl implements StoreService {
             comments.add(commentsitem);
         }
         item.accumulate("comments",comments);
+        item.accumulate("status","ok");
 
         return item;
     }
@@ -242,5 +247,129 @@ public class StoreServiceImpl implements StoreService {
             item.add(data);
         }
         return item;
+    }
+
+    public JSONObject getGoods(){
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Stores store = storeRepository.findByDistName(userDetails.getUsername());
+        List<Goods> GoodsList = goodsRepository.findByStoreId(store.getStoreId());
+        JSONObject allGoods = new JSONObject();
+        JSONArray goods = new JSONArray();
+        for(Goods good:GoodsList){
+            JSONObject item = new JSONObject();
+            item.accumulate("id", good.getGoodId());
+            String name = good.getGoodName();
+            if (!name.isEmpty()) {
+                item.accumulate("name", name);
+            }
+
+            BigDecimal price = good.getPrice();
+            if (price != null) {
+                item.accumulate("price", price);
+            }
+
+            BigDecimal count_price = good.getDiscount();
+            if (count_price != null) {
+                item.accumulate("coupon_price", count_price);
+            }
+
+            Long storage = good.getStorage();
+            if (storage != null) {
+                item.accumulate("storage", storage);
+            }
+
+            String description = good.getDescription();
+            if (!description.isEmpty()) {
+                item.accumulate("description", description);
+            }
+
+            String image_id = good.getGoodImageId();
+            if (!image_id.isEmpty()) {
+                item.accumulate("image_id", image_id);
+            }
+
+
+            Boolean hidden = good.getHidden();
+            if (hidden != null) {
+                item.accumulate("hidden", hidden);
+            }
+
+            List<Tags> tagsList = tagsRepository.findByGoodId(good.getGoodId());
+            List<String> list = new ArrayList<String>();
+            for(Tags tag:tagsList){
+                list.add(tag.getTagName());
+            }
+            item.accumulate("tags",list);
+            goods.add(item);
+        }
+        allGoods.accumulate("status","ok");
+        allGoods.accumulate("values",goods);
+        return  allGoods;
+    }
+
+    public String modifyGoods(JSONObject data){
+        Goods good = goodsRepository.findByGoodId(data.getLong("good_id"));
+        if(!data.getString("description").isEmpty()) {
+            good.setDescription(data.getString("description"));
+        }
+        if(!data.getString("image_id").isEmpty()) {
+            good.setGoodImageId(data.getString("image_id"));
+        }
+        if(!data.getString("name").isEmpty()) {
+            good.setGoodName(data.getString("name"));
+        }
+        Long price = data.getLong("price");
+        if( price != null) {
+            good.setPrice(new BigDecimal(data.getLong("price")));
+        }
+        Long coupon_price = data.getLong("coupon_price");
+        if( coupon_price != null) {
+            good.setDiscount(new BigDecimal(data.getLong("coupon_price")));
+        }
+        Long storage = data.getLong("storage");
+        if( coupon_price != null) {
+            good.setStorage(data.getLong("storage"));
+        }
+        Boolean hidden = data.getBoolean("hidden");
+        if(hidden != null) {
+            good.setHidden(hidden);
+        }
+        goodsRepository.save(good);
+        return "{\"status\": \"ok\"}";
+    }
+
+    public String addGood(JSONObject data){
+        try {
+            UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            Stores store = storeRepository.findByDistName(userDetails.getUsername());
+            Goods new_good = new Goods();
+            new_good.setHidden(false);
+            new_good.setStorage(data.getLong("storage"));
+            new_good.setDiscount(new BigDecimal(data.getLong("coupon_price")));
+            new_good.setPrice(new BigDecimal(data.getLong("price")));
+            new_good.setGoodName(data.getString("name"));
+            new_good.setGoodImageId(data.getString("image_id"));
+            new_good.setDescription(data.getString("description"));
+            new_good.setStoreId(store.getStoreId());
+            goodsRepository.save(new_good);
+            return "{\"status\": \"ok\"}";
+        }
+        catch (Exception ex){
+            return "{\"status\": \"internal_error\"}";
+        }
+    }
+
+    public String addTag(JSONObject data){
+        Tags tag = new Tags();
+        tag.setGoodId(data.getLong("good_id"));
+        tag.setTagName(data.getString("tag_name"));
+        tagsRepository.save(tag);
+        return "{\"status\": \"ok\"}";
+    }
+
+    public String deleteTag(JSONObject data){
+        Tags tag = tagsRepository.findByGoodIdAndAndTagName(data.getLong("good_id"),data.getString("tag_name"));
+        tagsRepository.delete(tag);
+        return "{\"status\": \"ok\"}";
     }
 }

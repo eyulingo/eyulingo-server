@@ -50,7 +50,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .permitAll()
                 .failureUrl("/failure").and()
                 // 定义登出操作
-                .logout().logoutSuccessUrl("/login?logout").permitAll().and()
+                .logout().logoutSuccessUrl("/kickout").permitAll().and()
                 .csrf().disable()
         ;
         // 禁用缓存
