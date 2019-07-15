@@ -22,7 +22,7 @@ public class StoreDistModifyController {
 
     @RequestMapping(value = "/store/modifydist",method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     @ResponseBody
-    public String adminModifyDist(@RequestBody JSONObject data) {
+    public String storeModifyDist(@RequestBody JSONObject data) {
         return this.storeService.modifyDist(data);
     }
 }

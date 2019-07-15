@@ -39,7 +39,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-                .authorizeRequests().antMatchers( "/img/download", "/img/upload", "/admin/login", "/failure", "/ok").permitAll()
+                .authorizeRequests().antMatchers( "/img/download", "/img/upload", "/admin/login", "/failure", "/ok","/").permitAll()
                 // 对于网站部分资源需要指定鉴权
 //             .antMatchers("/admin/**").hasRole("R_ADMIN")
                 // 除上面外的所有请求全部需要鉴权认证

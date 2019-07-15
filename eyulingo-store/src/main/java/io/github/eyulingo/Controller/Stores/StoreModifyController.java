@@ -20,7 +20,7 @@ public class StoreModifyController {
 
     @RequestMapping(value = "/store/modifystoreinfo",method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     @ResponseBody
-    public String adminModifyDist(@RequestBody JSONObject data, HttpServletRequest httpRequest, HttpServletResponse httpServletResponse) {
+    public String storeModifyDist(@RequestBody JSONObject data) {
         return this.storeService.changeMyStore(data);
     }
 }
