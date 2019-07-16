@@ -29,4 +29,8 @@ public interface UserService {
     public String removeAddress(JSONObject data);
 
     public String changeAddress(JSONObject data);
+
+    public JSONObject searchGoods(String data);
+
+    public JSONObject searchStore(String data);
 }

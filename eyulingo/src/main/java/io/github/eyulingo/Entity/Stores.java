@@ -1,11 +1,18 @@
 package io.github.eyulingo.Entity;
 
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Table(name = "stores")
-public class Stores implements Serializable {
+public class Stores implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "store_id")
@@ -153,6 +160,43 @@ public class Stores implements Serializable {
 
     public String getDeliverMethod() {
         return deliverMethod;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        List<GrantedAuthority> auths=new ArrayList<GrantedAuthority>();
+
+        auths.add(new SimpleGrantedAuthority("Dist"));
+
+        return auths;
+    }
+
+    @Override
+    public String getUsername() {
+        return this.distName;
+    }
+
+    @Override
+    public String getPassword() { return this.distPassword; }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 
 }
