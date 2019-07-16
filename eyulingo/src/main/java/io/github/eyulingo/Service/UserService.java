@@ -33,4 +33,8 @@ public interface UserService {
     public JSONObject searchGoods(String data);
 
     public JSONObject searchStore(String data);
+
+    public JSONObject goodDetail(Long id);
+
+    public JSONObject storeDetail(Long id);
 }

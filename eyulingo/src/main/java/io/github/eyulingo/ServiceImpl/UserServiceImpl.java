@@ -39,6 +39,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     TagsRepository tagsRepository;
 
+    @Autowired
+    GoodCommentsRepository goodCommentsRepository;
+
     public JSONObject getCheckCode(JSONObject data){
         Date now = new Date();
         Date beforeDate = new Date(now.getTime()-180000);
@@ -455,7 +458,7 @@ public class UserServiceImpl implements UserService {
         List<JSONObject> okGoods = new ArrayList();
         for(Goods good:goodsList){
             String goodname = good.getGoodName();
-            if(goodname.contains(data)){
+            if(goodname.contains(data) && good.getHidden() == false){
                 JSONObject item = new JSONObject();
                 item.accumulate("id",good.getGoodId());
                 item.accumulate("name",good.getGoodName());
@@ -501,5 +504,38 @@ public class UserServiceImpl implements UserService {
         result.accumulate("status","ok");
         result.accumulate("values",okStores);
         return  result;
+    }
+
+    public JSONObject goodDetail(Long id){
+        Goods good = goodsRepository.findByGoodId(id);
+        JSONObject item = new JSONObject();
+        item.accumulate("id",id);
+        item.accumulate("name",good.getGoodName());
+        item.accumulate("store",storeRepository.findByStoreId(good.getStoreId()).getStoreName());
+        item.accumulate("store_id",good.getStoreId());
+        item.accumulate("price",good.getPrice());
+        item.accumulate("coupon_price",good.getDiscount());
+        item.accumulate("storage",good.getStorage());
+        item.accumulate("description",good.getDescription());
+        item.accumulate("image_id",good.getGoodImageId());
+        List<GoodComments> commentsList = goodCommentsRepository.findByGoodId(id) ;
+        JSONArray comments =new JSONArray();
+        for(GoodComments goodComments:commentsList){
+            JSONObject commentsitem = new JSONObject();
+            Long userId = goodComments.getUserId();
+            Users user= userRepository.findByUserId(userId);
+            commentsitem.accumulate("username",user.getUsername());
+            commentsitem.accumulate("comment_content",goodComments.getGooodComment() );
+            commentsitem.accumulate("star_count",goodComments.getStar() );
+            comments.add(commentsitem);
+        }
+        item.accumulate("comments",comments);
+        item.accumulate("status","ok");
+        return item;
+    }
+
+    public JSONObject storeDetail(Long id){
+        Stores store = storeRepository.findByStoreId(id);
+        return null;
     }
 }
