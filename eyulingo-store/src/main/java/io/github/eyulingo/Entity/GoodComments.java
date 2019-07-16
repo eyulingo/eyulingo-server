@@ -4,6 +4,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
+@IdClass(GoodCommentsPK.class)
 @Table(name="goodcomments")
 public class GoodComments implements Serializable {
     @Id
@@ -12,7 +13,7 @@ public class GoodComments implements Serializable {
 
     @Id
     @Column(name = "user_id")
-    private String userId;
+    private Long userId;
 
     @Column(name = "star")
     private Long star;
@@ -44,7 +45,7 @@ public class GoodComments implements Serializable {
         return gooodComment;
     }
 
-    public String getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
@@ -52,7 +53,7 @@ public class GoodComments implements Serializable {
         this.gooodComment = gooodComment;
     }
 
-    public void setUserId(String userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 }
