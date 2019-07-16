@@ -9,6 +9,6 @@ import java.util.List;
 
 @Repository
 public interface AdminRepository extends CrudRepository<Admins,String> {
-    List<Admins> findByAdminName(String adminName);
+    Admins findByAdminName(String adminName);
     List<Admins>  findAll();
 }

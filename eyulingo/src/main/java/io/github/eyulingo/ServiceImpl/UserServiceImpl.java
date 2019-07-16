@@ -1,8 +1,6 @@
 package io.github.eyulingo.ServiceImpl;
 
-import io.github.eyulingo.Dao.CheckCodeRepository;
-import io.github.eyulingo.Dao.UserAddressRepository;
-import io.github.eyulingo.Dao.UserRepository;
+import io.github.eyulingo.Dao.*;
 import io.github.eyulingo.Entity.*;
 import io.github.eyulingo.Service.UserService;
 import io.github.eyulingo.Utilities.CodeSender;
@@ -12,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 import java.util.Date;
 import java.sql.Timestamp;
 
@@ -29,6 +29,15 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     UserAddressRepository userAddressRepository;
+
+    @Autowired
+    GoodsRepository goodsRepository;
+
+    @Autowired
+    StoreRepository storeRepository;
+
+    @Autowired
+    TagsRepository tagsRepository;
 
     public JSONObject getCheckCode(JSONObject data){
         Date now = new Date();
@@ -439,5 +448,58 @@ public class UserServiceImpl implements UserService {
         userAddress.setReceiverName(name);
         userAddressRepository.save(userAddress);
         return "{\"status\": \"ok\"}";
+    }
+
+    public JSONObject searchGoods(String data){
+        List<Goods> goodsList =  goodsRepository.findAll();
+        List<JSONObject> okGoods = new ArrayList();
+        for(Goods good:goodsList){
+            String goodname = good.getGoodName();
+            if(goodname.contains(data)){
+                JSONObject item = new JSONObject();
+                item.accumulate("id",good.getGoodId());
+                item.accumulate("name",good.getGoodName());
+                item.accumulate("store",storeRepository.findByStoreId(good.getStoreId()).getStoreName());
+                item.accumulate("store_id",good.getStoreId());
+                item.accumulate("price",good.getPrice());
+                item.accumulate("coupon_price",good.getDiscount());
+                item.accumulate("storage",good.getStorage());
+                item.accumulate("description",good.getDescription());
+                item.accumulate("image_id",good.getGoodImageId());
+                List<Tags> tags = tagsRepository.findByGoodId(good.getGoodId());
+                List<String> taglist = new ArrayList<String>();
+                for(Tags tag:tags){
+                    taglist.add(tag.getTagName());
+                }
+                item.accumulate("tags",taglist);
+                okGoods.add(item);
+            }
+        }
+        JSONObject result = new JSONObject();
+        result.accumulate("status","ok");
+        result.accumulate("values",okGoods);
+        return  result;
+    }
+
+    public JSONObject searchStore(String data){
+        List<Stores> storesList =  storeRepository.findAll();
+        List<JSONObject> okStores = new ArrayList();
+        for(Stores store:storesList){
+            String storename = store.getStoreName();
+            if(storename.contains(data)){
+                JSONObject item = new JSONObject();
+                item.accumulate("id",store.getStoreId());
+                item.accumulate("name",store.getStoreName());
+                item.accumulate("address",store.getStoreAddress());
+                item.accumulate("starttime",store.getStartTime());
+                item.accumulate("endtime",store.getEndTime());
+                item.accumulate("image_id",store.getCoverId());
+                okStores.add(item);
+            }
+        }
+        JSONObject result = new JSONObject();
+        result.accumulate("status","ok");
+        result.accumulate("values",okStores);
+        return  result;
     }
 }
