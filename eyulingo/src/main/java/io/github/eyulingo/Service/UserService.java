@@ -37,4 +37,10 @@ public interface UserService {
     public JSONObject goodDetail(Long id);
 
     public JSONObject storeDetail(Long id);
+
+    public String addToCart(JSONObject data);
+
+    public JSONObject myCart();
+
+    public String deleteCart(JSONObject data);
 }

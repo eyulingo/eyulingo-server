@@ -11,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.sql.Timestamp;
@@ -41,6 +42,12 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     GoodCommentsRepository goodCommentsRepository;
+
+    @Autowired
+    StoreCommentsRepository storeCommentsRepository;
+
+    @Autowired
+    CartRepository cartRepository;
 
     public JSONObject getCheckCode(JSONObject data){
         Date now = new Date();
@@ -536,6 +543,158 @@ public class UserServiceImpl implements UserService {
 
     public JSONObject storeDetail(Long id){
         Stores store = storeRepository.findByStoreId(id);
-        return null;
+        JSONObject item = new JSONObject();
+        if(store != null) {
+            item.accumulate("id", id);
+            String name = store.getStoreName();
+            if (!name.isEmpty()) {
+                item.accumulate("name", name);
+            }
+
+            String address = store.getStoreAddress();
+            if (!address.isEmpty()) {
+                item.accumulate("address", address);
+            }
+
+            String starttime = store.getStartTime();
+            if (!starttime.isEmpty()) {
+                item.accumulate("starttime", starttime);
+            }
+
+            String endtime = store.getEndTime();
+            if (!endtime.isEmpty()) {
+                item.accumulate("endtime", endtime);
+            }
+
+            String store_image_id = store.getCoverId();
+            if (!store_image_id.isEmpty()) {
+                item.accumulate("image_id", store_image_id);
+            }
+
+
+            String store_phone_nu = store.getStorePhone();
+            if (!store_phone_nu.isEmpty()) {
+                item.accumulate("phone_nu", store_phone_nu);
+            }
+
+            String dist_name = store.getDistName();
+            if (!dist_name.isEmpty()) {
+                item.accumulate("provider", dist_name);
+            }
+
+            String dist_image = store.getDistImageId();
+            if (!dist_name.isEmpty()) {
+                item.accumulate("provider_avatar", dist_image);
+            }
+
+            List<StoreComments> commentsList = storeCommentsRepository.findByStoreId(store.getStoreId());
+            JSONArray comments = new JSONArray();
+            for (StoreComments storeComments : commentsList) {
+                System.out.printf("Get one comment %s\n", storeComments.getStoreComments());
+                JSONObject commentsitem = new JSONObject();
+                Long userId = storeComments.getUserId();
+                Users user = userRepository.findByUserId(userId);
+                System.out.printf("Found username %s by %d\n", user.getUsername(), user.getUserId());
+                commentsitem.accumulate("username", user.getUsername());
+                commentsitem.accumulate("comment_content", storeComments.getStoreComments());
+                commentsitem.accumulate("star_count", storeComments.getStar());
+                comments.add(commentsitem);
+            }
+            item.accumulate("comments", comments);
+
+            List<Goods> GoodsList = goodsRepository.findByStoreId(id);
+            JSONArray goods = new JSONArray();
+            for (Goods good : GoodsList) {
+                if (good.getHidden() == false) {
+                    JSONObject items = new JSONObject();
+                    items.accumulate("id", good.getGoodId());
+                    String goodName = good.getGoodName();
+                    if (!name.isEmpty()) {
+                        items.accumulate("name", goodName);
+                    }
+
+                    BigDecimal price = good.getPrice();
+                    if (price != null) {
+                        items.accumulate("price", price);
+                    }
+
+                    BigDecimal count_price = good.getDiscount();
+                    if (count_price != null) {
+                        items.accumulate("coupon_price", count_price);
+                    }
+
+                    Long storage = good.getStorage();
+                    if (storage != null) {
+                        items.accumulate("storage", storage);
+                    }
+
+                    String description = good.getDescription();
+                    if (!description.isEmpty()) {
+                        items.accumulate("description", description);
+                    }
+
+                    String image_id = good.getGoodImageId();
+                    if (!image_id.isEmpty()) {
+                        items.accumulate("image_id", image_id);
+                    }
+
+                    goods.add(items);
+                }
+            }
+            item.accumulate("values", goods);
+            item.accumulate("status", "ok");
+            return item;
+        }
+        else {
+            item.accumulate("status", "not exist");
+            return item;
+        }
+    }
+
+    public String addToCart(JSONObject data){
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Users currentUser = userRepository.findByUserName(userDetails.getUsername());
+        Carts cart = new Carts();
+        cart.setUserId(currentUser.getUserId());
+        cart.setAmount(data.getLong("amount"));
+        cart.setGoodId(data.getLong("id"));
+        cartRepository.save(cart);
+        return "{\"status\": \"ok\"}";
+    }
+
+    public JSONObject myCart(){
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Users currentUser = userRepository.findByUserName(userDetails.getUsername());
+        List<Carts> cartList = cartRepository.findByUserId(currentUser.getUserId());
+        JSONArray items = new JSONArray();
+        for(Carts cart:cartList){
+            Goods good = goodsRepository.findByGoodId(cart.getGoodId());
+            if(good.getHidden() == false){
+                JSONObject item = new JSONObject();
+                item.accumulate("id",good.getGoodId());
+                item.accumulate("name",good.getGoodName());
+                item.accumulate("image_id",good.getGoodImageId());
+                item.accumulate("price",good.getDiscount());
+                item.accumulate("amount",cart.getAmount());
+                items.add(item);
+            }
+        }
+        JSONObject result = new JSONObject();
+        result.accumulate("status","ok");
+        result.accumulate("values",items);
+        return  result;
+    }
+
+    public String deleteCart(JSONObject data){
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Users currentUser = userRepository.findByUserName(userDetails.getUsername());
+        Carts cart = cartRepository.findByUserIdAndGoodId(currentUser.getUserId(),data.getLong("id"));
+        if(cart == null){
+            return "{\"status\": \"haven delete\"}";
+        }
+        else {
+            cartRepository.delete(cart);
+            return "{\"status\": \"ok\"}";
+        }
     }
 }

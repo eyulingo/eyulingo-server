@@ -18,7 +18,7 @@ public class SeacrhGoodsController {
     @RequestMapping(value = "/searchgood",method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
     public
     @ResponseBody
-    JSONObject userSearchGoood(HttpServletRequest httpServletRequest){
+    JSONObject userSearchGood(HttpServletRequest httpServletRequest){
         return this.userService.searchGoods(httpServletRequest.getParameter("q"));
     }
 }
