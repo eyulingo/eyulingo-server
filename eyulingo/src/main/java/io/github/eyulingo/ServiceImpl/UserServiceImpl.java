@@ -49,6 +49,12 @@ public class UserServiceImpl implements UserService {
     @Autowired
     CartRepository cartRepository;
 
+    @Autowired
+    OrderRepository orderRepository;
+
+    @Autowired
+    OrderitemsRepository orderitemsRepository;
+
     public JSONObject getCheckCode(JSONObject data){
         Date now = new Date();
         Date beforeDate = new Date(now.getTime()-180000);
@@ -465,7 +471,7 @@ public class UserServiceImpl implements UserService {
         List<JSONObject> okGoods = new ArrayList();
         for(Goods good:goodsList){
             String goodname = good.getGoodName();
-            if(goodname.contains(data) && good.getHidden() == false){
+            if(goodname.contains(data) && good.getHidden() == false && !data.isEmpty()){
                 JSONObject item = new JSONObject();
                 item.accumulate("id",good.getGoodId());
                 item.accumulate("name",good.getGoodName());
@@ -496,7 +502,7 @@ public class UserServiceImpl implements UserService {
         List<JSONObject> okStores = new ArrayList();
         for(Stores store:storesList){
             String storename = store.getStoreName();
-            if(storename.contains(data)){
+            if(storename.contains(data) && !data.isEmpty()){
                 JSONObject item = new JSONObject();
                 item.accumulate("id",store.getStoreId());
                 item.accumulate("name",store.getStoreName());
@@ -696,5 +702,190 @@ public class UserServiceImpl implements UserService {
             cartRepository.delete(cart);
             return "{\"status\": \"ok\"}";
         }
+    }
+
+    public JSONObject purchase(JSONObject data){
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Users currentUser = userRepository.findByUserName(userDetails.getUsername());
+        Date date = new Date();
+        Timestamp nowdate = new Timestamp(date.getTime());
+        String receive_name = data.getString("receive_name");
+        String receive_phone = data.getString("receive_phone");
+        String receive_address = data.getString("receive_address");
+        JSONArray idArray = data.getJSONArray("values");
+        List<Long> goodsId = new ArrayList<>();
+        List<Long> goodsAmount = new ArrayList<>();
+        for(Object ob:idArray){
+            JSONObject jsonObject = (JSONObject) ob;
+            Long id = jsonObject.getLong("id");
+            Long amount = jsonObject.getLong("amount");
+            goodsId.add(id);
+            Goods this_good = goodsRepository.findByGoodId(id);
+            goodsAmount.add(amount);
+            if(this_good == null || this_good.getHidden()==true){
+                JSONObject result = new JSONObject();
+                result.accumulate("status","Some goods have been removed from shelves");
+                return  result;
+            }
+            if(this_good.getStorage() < amount){
+                JSONObject result = new JSONObject();
+                result.accumulate("status","inadequate_storage");
+                return  result;
+            }
+
+        }
+        List<Long> storeId = new ArrayList<>();
+        for(Long id:goodsId){
+            Long new_id = goodsRepository.findByGoodId(id).getStoreId();
+            if(!storeId.contains(new_id)) {
+                storeId.add(new_id);
+            }
+        }
+
+        int size = goodsId.size();
+        BigDecimal cost = new BigDecimal(0);
+        for(Long store_id:storeId){
+            Orders order = new Orders();
+            order.setDeliverMethod(storeRepository.findByStoreId(store_id).getDeliverMethod());
+            order.setOrderTime(nowdate);
+            order.setReAddress(receive_address);
+            order.setReceiver(receive_name);
+            order.setStatus("pending");
+            order.setUserId(currentUser.getUserId());
+            order.setStoreId(store_id);
+            order.setRePhone(receive_phone);
+            orderRepository.save(order);
+            for(int i = 0;i<size;i++){
+                if(goodsRepository.findByGoodId(goodsId.get(i)).getStoreId() == store_id){
+                    OrderItems orderItem = new OrderItems();
+                    orderItem.setAmount(goodsAmount.get(i));
+                    orderItem.setCurrentPrice(goodsRepository.findByGoodId(goodsId.get(i)).getPrice());
+                    orderItem.setGoodId(goodsId.get(i));
+                    orderItem.setOrderId(order.getOrderId());
+                    orderitemsRepository.save(orderItem);
+                    Goods changed_good = goodsRepository.findByGoodId(goodsId.get(i));
+                    changed_good.setStorage(changed_good.getStorage()-goodsAmount.get(i));
+                    cost = goodsRepository.findByGoodId(goodsId.get(i)).getPrice().multiply(new BigDecimal(goodsAmount.get(i))).add(cost);
+                }
+            }
+        }
+        JSONObject result = new JSONObject();
+        result.accumulate("status","ok");
+        result.accumulate("cost",cost);
+        return  result;
+    }
+
+    public JSONObject orderList(){
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Users currentUser = userRepository.findByUserName(userDetails.getUsername());
+        List<Orders> ordersList = orderRepository.findByUserId(currentUser.getUserId());
+        JSONObject result = new JSONObject();
+        JSONArray values = new JSONArray();
+        for(Orders order:ordersList){
+            JSONObject item = new JSONObject();
+            item.accumulate("bill_id",order.getOrderId());
+            item.accumulate("receiver",order.getReceiver());
+            item.accumulate("receiver_phone",order.getRePhone());
+            item.accumulate("receiver_address",order.getReAddress());
+            item.accumulate("transport_method",order.getDeliverMethod());
+            item.accumulate("order_status",order.getStatus());
+            List<OrderItems> orderItemsList = orderitemsRepository.findByOrderId(order.getOrderId());
+            JSONArray goodsList = new JSONArray();
+            for(OrderItems orderItem:orderItemsList){
+                Goods good = goodsRepository.findByGoodId(orderItem.getGoodId());
+                Stores store = storeRepository.findByStoreId(good.getStoreId());
+                JSONObject goodDetail = new JSONObject();
+                goodDetail.accumulate("id",orderItem.getGoodId());
+                goodDetail.accumulate("name",good.getGoodName());
+                goodDetail.accumulate("store",store.getStoreName());
+                goodDetail.accumulate("store_id",store.getStoreId());
+                goodDetail.accumulate("current_price",orderItem.getCurrentPrice());
+                goodDetail.accumulate("amount",orderItem.getAmount());
+                goodDetail.accumulate("description",good.getDescription());
+                goodDetail.accumulate("image_id",good.getGoodImageId());
+                goodsList.add(goodDetail);
+            }
+            item.accumulate("goods",goodsList);
+            values.add(item);
+        }
+        result.accumulate("status","ok");
+        result.accumulate("values",values);
+        return result;
+    }
+
+    public String commentGoods(JSONObject data){
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Users currentUser = userRepository.findByUserName(userDetails.getUsername());
+        List<Orders> ordersList = orderRepository.findByUserId(currentUser.getUserId());
+        Long id = data.getLong("id");
+        Long star = data.getLong("star_count");
+        String comment = data.getString("comment_content");
+        List<OrderItems> isPurchase = new ArrayList<>();
+        for(Orders order:ordersList){
+            Long order_id = order.getOrderId();
+            OrderItems orderItems = orderitemsRepository.findByOrderIdAndGoodId(order_id,id);
+            if(orderItems != null){
+                isPurchase.add(orderItems);
+            }
+        }
+        if(isPurchase.size() == 0){
+            return "{\"status\": \"not purchased\"}";
+        }
+        else {
+            GoodComments newComment = new GoodComments();
+            newComment.setGoodId(id);
+            newComment.setGooodComment(comment);
+            newComment.setStar(star);
+            newComment.setUserId(currentUser.getUserId());
+            goodCommentsRepository.save(newComment);
+            return "{\"status\": \"ok\"}";
+        }
+    }
+
+    public String commentStores(JSONObject data){
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Users currentUser = userRepository.findByUserName(userDetails.getUsername());
+        List<Orders> ordersList = orderRepository.findByUserId(currentUser.getUserId());
+        Long id = data.getLong("id");
+        Long star = data.getLong("star_count");
+        String comment = data.getString("comment_content");
+        List<Orders> isPurchase = new ArrayList<>();
+        for(Orders order:ordersList){
+            Long order_id = order.getOrderId();
+            Orders orders = orderRepository.findByOrderIdAndStoreId(order_id,id);
+            if(orders != null){
+                isPurchase.add(orders);
+            }
+        }
+        if(isPurchase.size() == 0){
+            return "{\"status\": \"not purchased\"}";
+        }
+        else {
+            StoreComments newComment = new StoreComments();
+            newComment.setStoreId(id);
+            newComment.setStoreComments(comment);
+            newComment.setStar(star);
+            newComment.setUserId(currentUser.getUserId());
+            storeCommentsRepository.save(newComment);
+            return "{\"status\": \"ok\"}";
+        }
+    }
+
+    public JSONObject suggestion(String data){
+        List<Goods> allGoods = goodsRepository.findAll();
+        List<Stores> allStores = storeRepository.findAll();
+        List<String> allName = new ArrayList<>();
+        for(Goods good:allGoods){
+            if(good.getGoodName().contains(data) && !data.isEmpty())
+                allName.add(good.getGoodName());
+        }
+        for(Stores store:allStores){
+            if(store.getStoreName().contains(data) && !data.isEmpty())
+                allName.add(store.getStoreName());
+        }
+        JSONObject item = new JSONObject();
+        item.accumulate("status","ok");
+        item.accumulate("values",allName);
+        return item;
     }
 }

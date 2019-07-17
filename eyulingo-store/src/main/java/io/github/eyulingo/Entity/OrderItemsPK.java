@@ -1,12 +1,11 @@
 package io.github.eyulingo.Entity;
 
-
 import lombok.Data;
 
 import java.io.Serializable;
 
 @Data
-public class GoodCommentsPK implements Serializable {
+public class OrderItemsPK implements Serializable {
+    private Long orderId;
     private Long goodId;
-    private Long userId;
 }
