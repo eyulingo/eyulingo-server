@@ -8,7 +8,7 @@ import java.sql.Timestamp;
 @Table(name="orders")
 public class Orders {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_id")
     private Long orderId;
 
@@ -28,20 +28,23 @@ public class Orders {
     private String status;
 
     @Column(name = "user_id")
-    private String userId;
+    private Long userId;
 
     @Column(name = "order_time")
     private Timestamp orderTime;
+
+    @Column(name = "store_id")
+    private  Long storeId;
 
     public Orders(){
 
     }
 
-    public void setUserId(String userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 
-    public String getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
@@ -99,5 +102,13 @@ public class Orders {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public void setStoreId(Long storeId) {
+        this.storeId = storeId;
+    }
+
+    public Long getStoreId() {
+        return storeId;
     }
 }
