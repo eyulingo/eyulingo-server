@@ -1,5 +1,6 @@
 package io.github.eyulingo.Service;
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.JsonConfig;
 import org.springframework.stereotype.Service;
@@ -43,4 +44,15 @@ public interface UserService {
     public JSONObject myCart();
 
     public String deleteCart(JSONObject data);
+
+    public JSONObject purchase(JSONObject data);
+
+    public JSONObject orderList();
+
+    public String commentGoods(JSONObject data);
+
+    public String commentStores(JSONObject data);
+
+    public JSONObject suggestion(String data);
+
 }

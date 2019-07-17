@@ -11,4 +11,5 @@ import java.util.List;
 public interface GoodsRepository extends CrudRepository<Goods,Long> {
     List<Goods> findByStoreId(Long storeId);
     Goods findByGoodId(Long goodId);
+    List<Goods> findAll();
 }

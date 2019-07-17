@@ -33,4 +33,8 @@ public interface StoreService {
     public String addTag(JSONObject data);
 
     public String deleteTag(JSONObject data);
+
+    public JSONObject storeOrders();
+
+    public String setOrder(JSONObject data);
 }
