@@ -871,14 +871,22 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    public JSONObject suggestion(String data){
+    public JSONObject suggestionGood(String data){
         List<Goods> allGoods = goodsRepository.findAll();
-        List<Stores> allStores = storeRepository.findAll();
         List<String> allName = new ArrayList<>();
         for(Goods good:allGoods){
             if(good.getGoodName().contains(data) && !data.isEmpty())
                 allName.add(good.getGoodName());
         }
+        JSONObject item = new JSONObject();
+        item.accumulate("status","ok");
+        item.accumulate("values",allName);
+        return item;
+    }
+
+    public JSONObject suggestionStore(String data){
+        List<Stores> allStores = storeRepository.findAll();
+        List<String> allName = new ArrayList<>();
         for(Stores store:allStores){
             if(store.getStoreName().contains(data) && !data.isEmpty())
                 allName.add(store.getStoreName());

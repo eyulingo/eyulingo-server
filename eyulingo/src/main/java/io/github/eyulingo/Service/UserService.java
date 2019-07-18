@@ -53,6 +53,8 @@ public interface UserService {
 
     public String commentStores(JSONObject data);
 
-    public JSONObject suggestion(String data);
+    public JSONObject suggestionGood(String data);
+
+    public JSONObject suggestionStore(String data);
 
 }
