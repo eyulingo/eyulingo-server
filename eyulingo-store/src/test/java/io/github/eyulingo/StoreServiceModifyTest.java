@@ -46,20 +46,20 @@ public class StoreServiceModifyTest {
     }
 
 
-   /* @Test
+    @Test
     @WithMockUser(username="乌绮玉")
     public void modifyDistTest() {
         JSONObject item = new JSONObject();
-        item.accumulate("location", "上海市静安区中华新路479号");
-        item.accumulate("truename","乌绮玉asd");
+        item.accumulate("location", "上海市静安区中华新路479号123");
+        item.accumulate("truename","乌绮玉");
         item.accumulate("dist_phone_nu", "13640698865");
         item.accumulate("password", "Wuqiyu123456");
         storeService.modifyDist(item);
-        assertEquals("乌绮玉asd",storeService.getDist().getString("truename"));
+        assertEquals("上海市静安区中华新路479号123",storeService.getDist().getString("location"));
 
     }
 
-    */
+
 
     @Test
     @WithMockUser(username = "乌绮玉")
@@ -74,6 +74,15 @@ public class StoreServiceModifyTest {
         assertEquals("Apple Store 零售店 b",storeService.getMyStore().getString("name"));
     }
 
+
+    @Test
+    @WithMockUser(username="乌绮玉")
+    public void changeDistImageTest(){
+        JSONObject item = new JSONObject();
+        item.accumulate("image_id","456789");
+        storeService.ChangeDistImage(item);
+        assertEquals("456789",storeService.getDist().getString("dist_image_id"));
+    }
 
 
 

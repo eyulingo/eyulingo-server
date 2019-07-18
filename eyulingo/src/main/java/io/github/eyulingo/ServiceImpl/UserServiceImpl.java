@@ -680,12 +680,20 @@ public class UserServiceImpl implements UserService {
     public String addToCart(JSONObject data){
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Users currentUser = userRepository.findByUserName(userDetails.getUsername());
-        Carts cart = new Carts();
-        cart.setUserId(currentUser.getUserId());
-        cart.setAmount(data.getLong("amount"));
-        cart.setGoodId(data.getLong("id"));
-        cartRepository.save(cart);
-        return "{\"status\": \"ok\"}";
+        Carts cartTest = cartRepository.findByUserIdAndGoodId(currentUser.getUserId(),data.getLong("id"));
+        if(cartTest != null){
+            cartTest.setAmount(cartTest.getAmount()+data.getLong("amount"));
+            cartRepository.save(cartTest);
+            return "{\"status\": \"ok\"}";
+        }
+        else {
+            Carts cart = new Carts();
+            cart.setUserId(currentUser.getUserId());
+            cart.setAmount(data.getLong("amount"));
+            cart.setGoodId(data.getLong("id"));
+            cartRepository.save(cart);
+            return "{\"status\": \"ok\"}";
+        }
     }
 
     public JSONObject myCart(){
