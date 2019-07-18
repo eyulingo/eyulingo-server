@@ -1,6 +1,8 @@
 package io.github.eyulingo.Service;
 
+
 import net.sf.json.JSONObject;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -9,23 +11,27 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.util.jar.JarEntry;
-
-import static org.junit.Assert.*;
+import static net.sf.json.test.JSONAssert.assertEquals;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
 
+/**
+ * Created by admin on 2017/9/21-11:33.
+ * Description :
+ */
 @Transactional
 @Rollback()
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
-public class AdminServiceTest {
+public class UserServiceMessageTest {
+    @Autowired
+    private UserService userService;
+
     private MockMvc mockMvc;
 
     @Autowired
@@ -36,31 +42,30 @@ public class AdminServiceTest {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).apply(springSecurity()).build();
     }
 
-    @Autowired
-    private AdminService adminService;
-
     @Test
-    @WithMockUser(username="Admin1")
-    public void modifyStoresTest(){
-        JSONObject data = new JSONObject();
-        data.accumulate("store_id",1 );
-        data.accumulate("name","二餐便利店");
-        data.accumulate("address", "地址，某地");
-        data.accumulate("starttime", "28:00" );
-        data.accumulate("endtime","-0:00" );
-        data.accumulate("store_phone_nu","电话号码");
-        assertEquals("{\"status\": \"ok\"}",adminService.modifyStores(data));
+    public void getCheckCodeTest(){
+        JSONObject data= new JSONObject();
+        data.accumulate("email","121728670@qq.com");
+        JSONObject item = new JSONObject();
+        item.accumulate("status","ok");
+        assertEquals(item, userService.getCheckCode(data));
     }
 
+
+
     @Test
-    @WithMockUser(username="Admin1")
-    public  void modifyDistTest(){
-        JSONObject data = new JSONObject();
-        data.accumulate("store_id",1 );
-        data.accumulate("location", "家庭地址");
-        data.accumulate("truename","真实姓名");
-        data.accumulate("dist_phone_nu", "经销商名字");
-        data.accumulate("password","123456");
-        assertEquals("{\"status\": \"ok\"}",adminService.modifyDist(data));
+    @WithMockUser(username="无竹")
+    public void getMeTest() {
+        JSONObject item = new JSONObject();
+        item.accumulate("username","无竹");
+        item.accumulate("userid","6");
+        item.accumulate("email", "wu_zhu@foxmail.com");
+        item.accumulate("avatar","5d1d5d6b6344590007151439" );
+        item.accumulate("status", "ok");
+        assertEquals(item, userService.getMe());
     }
+
+
+
+
 }

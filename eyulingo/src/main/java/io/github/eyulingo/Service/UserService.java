@@ -57,4 +57,8 @@ public interface UserService {
 
     public JSONObject suggestionStore(String data);
 
+    public String getPassword();
+
+    public String editCart(JSONObject data);
+
 }

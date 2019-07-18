@@ -532,6 +532,7 @@ public class UserServiceImpl implements UserService {
         item.accumulate("description",good.getDescription());
         item.accumulate("image_id",good.getGoodImageId());
         List<GoodComments> commentsList = goodCommentsRepository.findByGoodId(id) ;
+        BigDecimal star = new BigDecimal(0);
         JSONArray comments =new JSONArray();
         for(GoodComments goodComments:commentsList){
             JSONObject commentsitem = new JSONObject();
@@ -541,8 +542,17 @@ public class UserServiceImpl implements UserService {
             commentsitem.accumulate("comment_content",goodComments.getGooodComment() );
             commentsitem.accumulate("star_count",goodComments.getStar() );
             comments.add(commentsitem);
+            star.add(new BigDecimal(goodComments.getStar()));
         }
         item.accumulate("comments",comments);
+        if(commentsList.size()>0) {
+            item.accumulate("star_number", commentsList.size());
+            item.accumulate("star", star.divide(new BigDecimal(commentsList.size())));
+        }
+        else{
+            item.accumulate("star_number", 0);
+            item.accumulate("star", 0);
+        }
         item.accumulate("status","ok");
         return item;
     }
@@ -595,6 +605,7 @@ public class UserServiceImpl implements UserService {
 
             List<StoreComments> commentsList = storeCommentsRepository.findByStoreId(store.getStoreId());
             JSONArray comments = new JSONArray();
+            BigDecimal star = new BigDecimal(0);
             for (StoreComments storeComments : commentsList) {
                 System.out.printf("Get one comment %s\n", storeComments.getStoreComments());
                 JSONObject commentsitem = new JSONObject();
@@ -604,9 +615,18 @@ public class UserServiceImpl implements UserService {
                 commentsitem.accumulate("username", user.getUsername());
                 commentsitem.accumulate("comment_content", storeComments.getStoreComments());
                 commentsitem.accumulate("star_count", storeComments.getStar());
+                star.add(new BigDecimal(storeComments.getStar()));
                 comments.add(commentsitem);
             }
             item.accumulate("comments", comments);
+            if(commentsList.size()>0) {
+                item.accumulate("star_number", commentsList.size());
+                item.accumulate("star", star.divide(new BigDecimal(commentsList.size())));
+            }
+            else{
+                item.accumulate("star_number", 0);
+                item.accumulate("star", 0);
+            }
 
             List<Goods> GoodsList = goodsRepository.findByStoreId(id);
             JSONArray goods = new JSONArray();
@@ -677,11 +697,15 @@ public class UserServiceImpl implements UserService {
             Goods good = goodsRepository.findByGoodId(cart.getGoodId());
             if(good.getHidden() == false){
                 JSONObject item = new JSONObject();
+                Stores store = storeRepository.findByStoreId(good.getStoreId());
                 item.accumulate("id",good.getGoodId());
                 item.accumulate("name",good.getGoodName());
                 item.accumulate("image_id",good.getGoodImageId());
                 item.accumulate("price",good.getDiscount());
                 item.accumulate("amount",cart.getAmount());
+                item.accumulate("store_id",store.getStoreId());
+                item.accumulate("store",store.getStoreName());
+                item.accumulate("storage",good.getStorage());
                 items.add(item);
             }
         }
@@ -895,5 +919,22 @@ public class UserServiceImpl implements UserService {
         item.accumulate("status","ok");
         item.accumulate("values",allName);
         return item;
+    }
+
+    public String getPassword(){
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Users currentUser = userRepository.findByUserName(userDetails.getUsername());
+        return currentUser.getPassword();
+    }
+
+    public String editCart(JSONObject data){
+        Long id = data.getLong("id");
+        Long amount = data.getLong("amount");
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Users currentUser = userRepository.findByUserName(userDetails.getUsername());
+        Carts cart = cartRepository.findByUserIdAndGoodId(currentUser.getUserId(),id);
+        cart.setAmount(amount);
+        cartRepository.save(cart);
+        return "{\"status\": \"ok\"}";
     }
 }

@@ -41,22 +41,6 @@ public class StoreServiceImpl implements StoreService {
     @Autowired
     OrderitemsRepository orderitemsRepository;
 
-    public String distLogin(JSONObject data) {
-        try {
-            System.out.println(data.getString("distName"));
-            Stores dist = storeRepository.findByDistName(data.getString("distName"));
-            if (dist == null) return "{\"status\": \"distName not exists\"}";
-
-            if (dist.getDistPassword().equals(data.getString("password"))) {
-                return "{\"status\": \"ok\"}";
-            } else {
-                return "{\"status\": \"Incorrect password\"}";
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return "{\"status\": \"internal_error\"}";
-        }
-    }
 
     public JSONObject getDist() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -166,7 +150,8 @@ public class StoreServiceImpl implements StoreService {
             item.accumulate("store_phone_nu", store_phone_nu);
         }
 
-        List<StoreComments> commentsList = storeCommentsRepository.findByStoreId(store.getStoreId()) ;
+        List<StoreComments> commentsList = storeCommentsRepository.findByStoreId(store.getStoreId());
+        BigDecimal star = new BigDecimal(0);
         JSONArray comments =new JSONArray();
         for(StoreComments storeComments:commentsList){
             System.out.printf("Get one comment %s\n", storeComments.getStoreComments());
@@ -178,6 +163,15 @@ public class StoreServiceImpl implements StoreService {
             commentsitem.accumulate("comment_content",storeComments.getStoreComments() );
             commentsitem.accumulate("star_count",storeComments.getStar() );
             comments.add(commentsitem);
+            star.add(new BigDecimal(storeComments.getStar()));
+        }
+        if(commentsList.size()>0) {
+            item.accumulate("star_number", commentsList.size());
+            item.accumulate("star", star.divide(new BigDecimal(commentsList.size())));
+        }
+        else{
+            item.accumulate("star_number", 0);
+            item.accumulate("star", 0);
         }
         item.accumulate("comments",comments);
         item.accumulate("status","ok");
