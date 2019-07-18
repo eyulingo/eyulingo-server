@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 
 @RestController
-public class SuggestionController {
+public class SuggestionGoodController {
     @Autowired
     private UserService userService;
 
@@ -19,6 +19,6 @@ public class SuggestionController {
     public
     @ResponseBody
     JSONObject userSuggestion(HttpServletRequest httpServletRequest){
-        return this.userService.suggestion(httpServletRequest.getParameter("q"));
+        return this.userService.suggestionGood(httpServletRequest.getParameter("q"));
     }
 }
