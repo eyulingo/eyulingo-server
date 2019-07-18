@@ -22,8 +22,11 @@ services:
       - "8080:8080"
     links:
       - mysqldb
+      - mongo
     depends_on:
       mysqldb:
+        condition: service_healthy
+      mongo:
         condition: service_healthy
     container_name: server
     restart: always
@@ -51,3 +54,25 @@ services:
         condition: service_healthy
     container_name: dist-panel
     restart: always
+  
+  mongo:
+    image: mongo:3.2.6
+    ports:
+      - "27017:27017"
+    healthcheck:
+      test: echo 'db.stats().ok' | mongo mongo:27017/eyulingo_imgs --quiet
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  mongo-seed:
+    image: mongo:3.2.6
+    links:
+      - mongo
+    depends_on:
+      mongo:
+        condition: service_healthy
+    volumes:
+      - ./mongo-seed:/mongo-seed
+    command:
+      /mongo-seed/import.sh
