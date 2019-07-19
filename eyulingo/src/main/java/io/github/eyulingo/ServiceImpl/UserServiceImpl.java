@@ -75,16 +75,16 @@ public class UserServiceImpl implements UserService {
         Timestamp lastGetTime = newestCode.getTime();
         if(!email.matches("\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*"))
         {
-            item.accumulate("status","bad_email");
+            item.accumulate("status","邮箱格式错误");
             return item;
         }
         else if(usertest != null){
-            item.accumulate("status","exist email");
+            item.accumulate("status","邮箱已被注册");
             return item;
 
         }
         else if(emalitset.size() != 0 && lastGetTime.compareTo(getDate) >= 0){
-            item.accumulate("status","Two applications should be three minutes apart");
+            item.accumulate("status","获取验证码三分钟后才能再次获取");
             return item;
         }
         else {
@@ -110,7 +110,7 @@ public class UserServiceImpl implements UserService {
                 return item;
             } catch (Exception ex) {
                 ex.printStackTrace();
-                item.accumulate("status", "failed_to_send");
+                item.accumulate("status", "发送失败");
                 return item;
             }
         }
@@ -129,24 +129,24 @@ public class UserServiceImpl implements UserService {
         Date date = new Date(now.getTime()-180000);
         Timestamp registerdate = new Timestamp(date.getTime());
         if(username.isEmpty() || password.isEmpty() || confirm_code.isEmpty() || confirm_password.isEmpty() || email.isEmpty()){
-            return  "{\"status\": \"Your message can't be empty\"}";
+            return  "{\"status\": \"各项信息不能为空\"}";
         }
         else if(!password.matches("^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z_]{8,20}$")){
-            return  "{\"status\": \"bad_form_password\"}";
+            return  "{\"status\": \"密码格式错误\"}";
         }
         else if(!password.equals(confirm_password)) {
-            return  "{\"status\": \"bad_confirm_password\"}";
+            return  "{\"status\": \"两次密码不一致\"}";
         }
         else if(usertest1 != null){
-            return  "{\"status\": \"email_exist\"}";
+            return  "{\"status\": \"邮箱已被使用\"}";
         }
         else if(usertest2 != null){
-            return  "{\"status\": \"username_exist\"}";
+            return  "{\"status\": \"用户名已被使用\"}";
         }
         else if(!email.matches("\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*"))
         {
 
-            return "{\"status\": \"bad_email\"}";
+            return "{\"status\": \"邮箱格式错误\"}";
         }
         else {
             List<CheckCodes> LCode = checkCodeRepository.findByUserEmail(email);
@@ -167,11 +167,11 @@ public class UserServiceImpl implements UserService {
                     userRepository.save(newuser);
                     return "{\"status\": \"ok\"}";
                 } else {
-                    return "{\"status\": \"bad_confirm_code\"}";
+                    return "{\"status\": \"验证码错误\"}";
                 }
             }
             else {
-                return "{\"status\": \"not_get_confirm_code\"}";
+                return "{\"status\": \"请先获取验证码\"}";
             }
         }
     }
@@ -214,15 +214,15 @@ public class UserServiceImpl implements UserService {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Users currentUser = userRepository.findByUserName(userDetails.getUsername());
         if(data.getString("new_password").isEmpty() || data.getString("origin_password").isEmpty() || data.getString("confirm_new_password").isEmpty()){
-            return "{\"status\": \"password can't be empty\"}";
+            return "{\"status\": \"密码不能为空\"}";
         }
         if(!data.getString("new_password").matches("^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z_]{8,20}$")){
-            return  "{\"status\": \"bad_form_password\"}";
+            return  "{\"status\": \"密码格式错误\"}";
         }
         if(data.getString("origin_password").equals(currentUser.getPassword())){
             if(data.getString("new_password").equals(data.getString("confirm_new_password"))){
                 if(data.getString("new_password").equals(data.getString("origin_password"))){
-                    return "{\"status\": \"origin_name is same with new_password\"}";
+                    return "{\"status\": \"旧密码不能与新密码相同\"}";
                 }
                 else {
                     currentUser.setPassword(data.getString("new_password"));
@@ -231,11 +231,11 @@ public class UserServiceImpl implements UserService {
                 }
             }
             else{
-                return "{\"status\": \"bad_confirm\"}";
+                return "{\"status\": \"两次输入新密码应相同\"}";
             }
         }
         else{
-            return "{\"status\": \"wrong_origin_password\"}";
+            return "{\"status\": \"旧密码错误\"}";
         }
     }
 
@@ -243,7 +243,7 @@ public class UserServiceImpl implements UserService {
         String new_email = data.getString("new_email");
         if(!new_email.matches("\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*"))
         {
-            return "{\"status\": \"bad_email\"}";
+            return "{\"status\": \"邮箱格式错误\"}";
         }
         String check_code = data.getString("confirm_code");
         Date now = new Date();
@@ -265,11 +265,11 @@ public class UserServiceImpl implements UserService {
                 userRepository.save(currentUser);
                 return "{\"status\": \"ok\"}";
             } else {
-                return "{\"status\": \"bad_confirm_code\"}";
+                return "{\"status\": \"验证码错误\"}";
             }
         }
         else {
-            return "{\"status\": \"bad_confirm_code\"}";
+            return "{\"status\": \"验证码错误\"}";
         }
     }
 
@@ -278,7 +278,7 @@ public class UserServiceImpl implements UserService {
         Users missUser = userRepository.findByUserName(username);
         if (missUser == null){
             JSONObject item = new JSONObject();
-            item.accumulate("status","no_such_user");
+            item.accumulate("status","用户不存在");
             return  item;
         }
         else{
@@ -300,11 +300,11 @@ public class UserServiceImpl implements UserService {
             Timestamp lastGetTime = newestCode.getTime();
             if(!email.matches("\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*"))
             {
-                item.accumulate("status","bad_email");
+                item.accumulate("status","邮箱格式错误");
                 return item;
             }
             else if(lastGetTime.compareTo(getDate) >= 0){
-                item.accumulate("status","Two applications should be three minutes apart ");
+                item.accumulate("status","两次验证码获取需间隔三分钟");
                 return item;
             }
             else {
@@ -328,7 +328,7 @@ public class UserServiceImpl implements UserService {
                     return item;
                 } catch (Exception ex) {
                     ex.printStackTrace();
-                    item.accumulate("status", "failed_to_send");
+                    item.accumulate("status", "发送失败");
                     return item;
                 }
             }
@@ -345,13 +345,13 @@ public class UserServiceImpl implements UserService {
         Date date = new Date(now.getTime()-180000);
         Timestamp finddate = new Timestamp(date.getTime());
         if(!password.matches("^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z_]{8,20}$")){
-            return  "{\"status\": \"bad_form_password\"}";
+            return  "{\"status\": \"密码格式错误\"}";
         }
         else if(!password.equals(confirm)){
-            return "{\"status\": \"bad_confirm\"}";
+            return "{\"status\": \"两次输入密码需相同\"}";
         }
         else if (missUser == null){
-            return "{\"status\": \"no_such_user\"}";
+            return "{\"status\": \"该用户不存在\"}";
         }
         else {
             String email = missUser.getUserEmail();
@@ -370,11 +370,11 @@ public class UserServiceImpl implements UserService {
                     userRepository.save(missUser);
                     return "{\"status\": \"ok\"}";
                 } else {
-                    return "{\"status\": \"bad_confirm_code\"}";
+                    return "{\"status\": \"错误验证码\"}";
                 }
             }
             else {
-                return "{\"status\": \"not_get_confirm_code\"}";
+                return "{\"status\": \"请先获取验证码\"}";
             }
         }
 
@@ -406,12 +406,12 @@ public class UserServiceImpl implements UserService {
         String phone = data.getString("receive_phone");
         String new_address = data.getString("receive_address");
         if(name.isEmpty() || phone.isEmpty() || new_address.isEmpty()){
-            return "{\"status\": \"address can't have empty part\"}";
+            return "{\"status\": \"地址信息不能为空\"}";
         }
         List<UserAddress> addressList = userAddressRepository.findByUserId(currentUser.getUserId()) ;
         for(UserAddress old_address:addressList){
             if(old_address.getReceiverAddress().equals(new_address) && old_address.getReceiverName().equals(name) && old_address.getRecevierPhone().equals(phone)){
-                return "{\"status\": \"added address\"}";
+                return "{\"status\": \"存在的地址\"}";
             }
         }
         UserAddress userAddress = new UserAddress();
@@ -436,7 +436,7 @@ public class UserServiceImpl implements UserService {
                 return "{\"status\": \"ok\"}";
             }
         }
-        return "{\"status\": \"no such address\"}";
+        return "{\"status\": \"地址已被删除\"}";
     }
 
     public String changeAddress(JSONObject data){
@@ -451,7 +451,7 @@ public class UserServiceImpl implements UserService {
         List<UserAddress> addressList = userAddressRepository.findByUserId(currentUser.getUserId()) ;
         for(UserAddress old_address:addressList){
             if(old_address.getReceiverAddress().equals(new_address) && old_address.getReceiverName().equals(name) && old_address.getRecevierPhone().equals(phone)){
-                return "{\"status\": \"exist address\"}";
+                return "{\"status\": \"地址已存在\"}";
             }
             if(old_address.getReceiverAddress().equals(remove_address) && old_address.getReceiverName().equals(remove_name) && old_address.getRecevierPhone().equals(remove_phone)){
                 userAddressRepository.delete(old_address);
@@ -672,7 +672,7 @@ public class UserServiceImpl implements UserService {
             return item;
         }
         else {
-            item.accumulate("status", "not exist");
+            item.accumulate("status", "商品不存在");
             return item;
         }
     }
@@ -728,7 +728,7 @@ public class UserServiceImpl implements UserService {
         Users currentUser = userRepository.findByUserName(userDetails.getUsername());
         Carts cart = cartRepository.findByUserIdAndGoodId(currentUser.getUserId(),data.getLong("id"));
         if(cart == null){
-            return "{\"status\": \"haven delete\"}";
+            return "{\"status\": \"商品已被删除\"}";
         }
         else {
             cartRepository.delete(cart);
@@ -756,12 +756,12 @@ public class UserServiceImpl implements UserService {
             goodsAmount.add(amount);
             if(this_good == null || this_good.getHidden()==true){
                 JSONObject result = new JSONObject();
-                result.accumulate("status","Some goods have been removed from shelves");
+                result.accumulate("status","选中的部分商品已下架");
                 return  result;
             }
             if(this_good.getStorage() < amount){
                 JSONObject result = new JSONObject();
-                result.accumulate("status","inadequate_storage");
+                result.accumulate("status","库存不足");
                 return  result;
             }
 
@@ -861,7 +861,7 @@ public class UserServiceImpl implements UserService {
             }
         }
         if(isPurchase.size() == 0){
-            return "{\"status\": \"not purchased\"}";
+            return "{\"status\": \"您未购买该商品，无法评价\"}";
         }
         else {
             GoodComments newComment = new GoodComments();
@@ -890,7 +890,7 @@ public class UserServiceImpl implements UserService {
             }
         }
         if(isPurchase.size() == 0){
-            return "{\"status\": \"not purchased\"}";
+            return "{\"status\": \"您未购买该店商品，无法评价\"}";
         }
         else {
             StoreComments newComment = new StoreComments();
@@ -907,7 +907,7 @@ public class UserServiceImpl implements UserService {
         List<Goods> allGoods = goodsRepository.findAll();
         List<String> allName = new ArrayList<>();
         for(Goods good:allGoods){
-            if(good.getGoodName().contains(data) && !data.isEmpty())
+            if(good.getGoodName().contains(data) && !data.isEmpty() && !good.getHidden())
                 allName.add(good.getGoodName());
         }
         JSONObject item = new JSONObject();

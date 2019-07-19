@@ -79,7 +79,7 @@ public class StoreServiceImpl implements StoreService {
             UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             Stores store = storeRepository.findByDistName(userDetails.getUsername());
             if(storeRepository.findByDistName(data.getString("truename")) != null && !data.getString("truename").equals(store.getDistName())){
-                return "{\"status\": \"used_name\"}";
+                return "{\"status\": \"用户名已被他人使用\"}";
             }
 
             String location = data.getString("location");
@@ -105,7 +105,7 @@ public class StoreServiceImpl implements StoreService {
             return "{\"status\": \"ok\"}";
         } catch (Exception ex) {
             ex.printStackTrace();
-            return "{\"status\": \"modify failed\"}";
+            return "{\"status\": \"修改失败\"}";
         }
     }
 
