@@ -471,7 +471,7 @@ public class UserServiceImpl implements UserService {
         List<JSONObject> okGoods = new ArrayList();
         for(Goods good:goodsList){
             String goodname = good.getGoodName();
-            if(goodname.contains(data) && good.getHidden() == false && !data.isEmpty()){
+            if(goodname.contains(data) && good.getHidden() == false && !data.isEmpty() ){
                 JSONObject item = new JSONObject();
                 item.accumulate("id",good.getGoodId());
                 item.accumulate("name",good.getGoodName());
@@ -747,6 +747,7 @@ public class UserServiceImpl implements UserService {
         JSONArray idArray = data.getJSONArray("values");
         List<Long> goodsId = new ArrayList<>();
         List<Long> goodsAmount = new ArrayList<>();
+        List<Long> orderId = new ArrayList<>();
         for(Object ob:idArray){
             JSONObject jsonObject = (JSONObject) ob;
             Long id = jsonObject.getLong("id");
@@ -782,11 +783,12 @@ public class UserServiceImpl implements UserService {
             order.setOrderTime(nowdate);
             order.setReAddress(receive_address);
             order.setReceiver(receive_name);
-            order.setStatus("pending");
+            order.setStatus("unpurchased");
             order.setUserId(currentUser.getUserId());
             order.setStoreId(store_id);
             order.setRePhone(receive_phone);
             orderRepository.save(order);
+            orderId.add(order.getOrderId());
             for(int i = 0;i<size;i++){
                 if(goodsRepository.findByGoodId(goodsId.get(i)).getStoreId() == store_id){
                     OrderItems orderItem = new OrderItems();
@@ -804,6 +806,7 @@ public class UserServiceImpl implements UserService {
         JSONObject result = new JSONObject();
         result.accumulate("status","ok");
         result.accumulate("cost",cost);
+        result.accumulate("order_id",orderId);
         return  result;
     }
 
@@ -907,7 +910,7 @@ public class UserServiceImpl implements UserService {
         List<Goods> allGoods = goodsRepository.findAll();
         List<String> allName = new ArrayList<>();
         for(Goods good:allGoods){
-            if(good.getGoodName().contains(data) && !data.isEmpty() && !good.getHidden())
+            if(good.getGoodName().contains(data) && !data.isEmpty() && !good.getHidden() && !allName.contains(data))
                 allName.add(good.getGoodName());
         }
         JSONObject item = new JSONObject();
@@ -920,7 +923,7 @@ public class UserServiceImpl implements UserService {
         List<Stores> allStores = storeRepository.findAll();
         List<String> allName = new ArrayList<>();
         for(Stores store:allStores){
-            if(store.getStoreName().contains(data) && !data.isEmpty())
+            if(store.getStoreName().contains(data) && !data.isEmpty() && !allName.contains(data))
                 allName.add(store.getStoreName());
         }
         JSONObject item = new JSONObject();
@@ -945,4 +948,22 @@ public class UserServiceImpl implements UserService {
         cartRepository.save(cart);
         return "{\"status\": \"ok\"}";
     }
+
+    public String pay(JSONObject data){
+        JSONArray orderIds = data.getJSONArray("order_id");
+        for(Object orderId:orderIds){
+            JSONObject item = (JSONObject) orderId;
+            Long ID = item.getLong("order_id");
+            Orders order = orderRepository.findByOrderId(ID);
+            if(order.getStatus().equals("unpurchased")) {
+                order.setStatus("pending");
+                orderRepository.save(order);
+            }
+            else{
+                return "{\"status\": \"选中的部分订单已支付\"}";
+            }
+        }
+        return "{\"status\": \"ok\"}";
+    }
+
 }

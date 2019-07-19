@@ -61,4 +61,6 @@ public interface UserService {
 
     public String editCart(JSONObject data);
 
+    public String pay(JSONObject data);
+
 }
