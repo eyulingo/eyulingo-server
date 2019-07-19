@@ -18,6 +18,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static junit.framework.Assert.failNotEquals;
 import static net.sf.json.test.JSONAssert.assertEquals;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
@@ -81,8 +84,36 @@ public class StoreServiceMessageTest {
         assertEquals(item,storeService.getMyStore());
     }
 
+    @Test
+    @WithMockUser(username = "乌绮玉")
+    public void getDeliverTest(){
+        JSONObject item = new JSONObject();
+        item.accumulate("status", "ok");
+        item.accumulate("delivery_method","顺丰速运");
+        assertEquals(item,storeService.getDeliver());
+    }
 
-
+    @Test
+    @WithMockUser(username = "乌绮玉")
+    public void getAllDeliver(){
+        JSONArray items = new JSONArray();
+        List<String> list = new ArrayList<String>();
+        list.add("中通快递");
+        list.add("圆通快递");
+        list.add("宅急送");
+        list.add("汇通快递");
+        list.add("申通快递");
+        list.add("自提");
+        list.add("邮政EMS");
+        list.add("韵达快递");
+        list.add("顺丰速运");
+        for(int i = 0;i<list.size();i++){
+            JSONObject item = new JSONObject();
+            item.accumulate("delivery_method",list.get(i));
+            items.add(item);
+        }
+        assertEquals(items,storeService.getAllDeliver());
+    }
 
 
 }

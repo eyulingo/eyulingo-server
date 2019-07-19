@@ -76,7 +76,7 @@ public class StoreServiceModifyTest {
 
 
     @Test
-    @WithMockUser(username="乌绮玉")
+    @WithMockUser(username = "乌绮玉")
     public void changeDistImageTest(){
         JSONObject item = new JSONObject();
         item.accumulate("image_id","456789");
@@ -84,6 +84,23 @@ public class StoreServiceModifyTest {
         assertEquals("456789",storeService.getDist().getString("dist_image_id"));
     }
 
+    @Test
+    @WithMockUser(username = "乌绮玉")
+    public void changeStoreImageTest(){
+        JSONObject item = new JSONObject();
+        item.accumulate("image_id","456789");
+        storeService.changeStoreImage(item);
+        assertEquals("456789",storeService.getMyStore().getString("store_image_id"));
+    }
+
+    @Test
+    @WithMockUser(username = "乌绮玉")
+    public void setDeliverTest(){
+        JSONObject item = new JSONObject();
+        item.accumulate("delivery","自提");
+        storeService.setDeliver(item);
+        assertEquals("自提",storeService.getDeliver().getString("delivery_method"));
+    }
 
 
 }
