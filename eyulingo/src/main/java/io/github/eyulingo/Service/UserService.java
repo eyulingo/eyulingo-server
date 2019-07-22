@@ -63,4 +63,6 @@ public interface UserService {
 
     public String pay(JSONObject data);
 
+    public String deleteOrder(JSONObject data);
+
 }

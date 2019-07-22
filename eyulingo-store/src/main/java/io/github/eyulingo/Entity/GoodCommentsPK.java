@@ -8,5 +8,5 @@ import java.io.Serializable;
 @Data
 public class GoodCommentsPK implements Serializable {
     private Long goodId;
-    private String userId;
+    private Long userId;
 }
