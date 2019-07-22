@@ -391,33 +391,35 @@ public class StoreServiceImpl implements StoreService {
         JSONObject result = new JSONObject();
         JSONArray values = new JSONArray();
         for(Orders order:ordersList){
-            JSONObject item = new JSONObject();
-            item.accumulate("user_id",order.getUserId());
-            item.accumulate("username",userRepository.findByUserId(order.getUserId()).getUserName());
-            item.accumulate("bill_id",order.getOrderId());
-            item.accumulate("receiver",order.getReceiver());
-            item.accumulate("receiver_phone",order.getRePhone());
-            item.accumulate("receiver_address",order.getReAddress());
-            item.accumulate("transport_method",order.getDeliverMethod());
-            item.accumulate("order_status",order.getStatus());
-            item.accumulate("time",order.getOrderTime().toString());
-            List<OrderItems> orderItemsList = orderitemsRepository.findByOrderId(order.getOrderId());
-            JSONArray goodsList = new JSONArray();
-            for(OrderItems orderItem:orderItemsList){
-                Goods good = goodsRepository.findByGoodId(orderItem.getGoodId());
-                JSONObject goodDetail = new JSONObject();
-                goodDetail.accumulate("id",orderItem.getGoodId());
-                goodDetail.accumulate("name",good.getGoodName());
-                goodDetail.accumulate("store",store.getStoreName());
-                goodDetail.accumulate("store_id",store.getStoreId());
-                goodDetail.accumulate("current_price",orderItem.getCurrentPrice());
-                goodDetail.accumulate("amount",orderItem.getAmount());
-                goodDetail.accumulate("description",good.getDescription());
-                goodDetail.accumulate("image_id",good.getGoodImageId());
-                goodsList.add(goodDetail);
+            if(!order.getStatus().equals("unpurchased")) {
+                JSONObject item = new JSONObject();
+                item.accumulate("user_id", order.getUserId());
+                item.accumulate("username", userRepository.findByUserId(order.getUserId()).getUserName());
+                item.accumulate("bill_id", order.getOrderId());
+                item.accumulate("receiver", order.getReceiver());
+                item.accumulate("receiver_phone", order.getRePhone());
+                item.accumulate("receiver_address", order.getReAddress());
+                item.accumulate("transport_method", order.getDeliverMethod());
+                item.accumulate("order_status", order.getStatus());
+                item.accumulate("time", order.getOrderTime().toString());
+                List<OrderItems> orderItemsList = orderitemsRepository.findByOrderId(order.getOrderId());
+                JSONArray goodsList = new JSONArray();
+                for (OrderItems orderItem : orderItemsList) {
+                    Goods good = goodsRepository.findByGoodId(orderItem.getGoodId());
+                    JSONObject goodDetail = new JSONObject();
+                    goodDetail.accumulate("id", orderItem.getGoodId());
+                    goodDetail.accumulate("name", good.getGoodName());
+                    goodDetail.accumulate("store", store.getStoreName());
+                    goodDetail.accumulate("store_id", store.getStoreId());
+                    goodDetail.accumulate("current_price", orderItem.getCurrentPrice());
+                    goodDetail.accumulate("amount", orderItem.getAmount());
+                    goodDetail.accumulate("description", good.getDescription());
+                    goodDetail.accumulate("image_id", good.getGoodImageId());
+                    goodsList.add(goodDetail);
+                }
+                item.accumulate("goods", goodsList);
+                values.add(item);
             }
-            item.accumulate("goods",goodsList);
-            values.add(item);
         }
         values.sort(Comparator.comparing(obj -> ((JSONObject) obj).getString("time")).reversed());
         result.accumulate("status","ok");
@@ -429,6 +431,9 @@ public class StoreServiceImpl implements StoreService {
         Long id = data.getLong("id");
         String status = data.getString("status");
         Orders order = orderRepository.findByOrderId(id);
+        if(order.getStatus().equals("unpurchased")){
+           return "{\"status\": \"订单不存在\"}";
+        }
         order.setStatus(status);
         orderRepository.save(order);
         return "{\"status\": \"ok\"}";

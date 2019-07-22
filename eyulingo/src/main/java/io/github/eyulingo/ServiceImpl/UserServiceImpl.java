@@ -825,7 +825,7 @@ public class UserServiceImpl implements UserService {
             item.accumulate("receiver_address",order.getReAddress());
             item.accumulate("transport_method",order.getDeliverMethod());
             item.accumulate("order_status",order.getStatus());
-            item.accumulate("generate_time",order.getOrderTime());
+            item.accumulate("generate_time",order.getOrderTime().toString());
             List<OrderItems> orderItemsList = orderitemsRepository.findByOrderId(order.getOrderId());
             JSONArray goodsList = new JSONArray();
             for(OrderItems orderItem:orderItemsList){
