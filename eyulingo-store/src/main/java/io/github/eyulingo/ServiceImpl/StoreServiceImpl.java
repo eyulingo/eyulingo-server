@@ -11,8 +11,15 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import javax.xml.crypto.Data;
 import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.text.Format;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -40,6 +47,9 @@ public class StoreServiceImpl implements StoreService {
 
     @Autowired
     OrderitemsRepository orderitemsRepository;
+
+    @Autowired
+    GoodCommentsRepository goodCommentsRepository;
 
 
     public JSONObject getDist() {
@@ -390,6 +400,7 @@ public class StoreServiceImpl implements StoreService {
             item.accumulate("receiver_address",order.getReAddress());
             item.accumulate("transport_method",order.getDeliverMethod());
             item.accumulate("order_status",order.getStatus());
+            item.accumulate("time",order.getOrderTime().toString());
             List<OrderItems> orderItemsList = orderitemsRepository.findByOrderId(order.getOrderId());
             JSONArray goodsList = new JSONArray();
             for(OrderItems orderItem:orderItemsList){
@@ -408,6 +419,7 @@ public class StoreServiceImpl implements StoreService {
             item.accumulate("goods",goodsList);
             values.add(item);
         }
+        values.sort(Comparator.comparing(obj -> ((JSONObject) obj).getString("time")).reversed());
         result.accumulate("status","ok");
         result.accumulate("values",values);
         return result;
@@ -420,5 +432,102 @@ public class StoreServiceImpl implements StoreService {
         order.setStatus(status);
         orderRepository.save(order);
         return "{\"status\": \"ok\"}";
+    }
+
+    public JSONObject goodComments(Long id){
+        List<GoodComments> commentsList = goodCommentsRepository.findByGoodId(id);
+        JSONObject item = new JSONObject();
+        JSONArray commentItems = new JSONArray();
+        BigDecimal star = new BigDecimal(0);
+        for(GoodComments comment:commentsList){
+            JSONObject commentItem = new JSONObject();
+            Users users = userRepository.findByUserId(comment.getUserId());
+            commentItem.accumulate("username",users.getUserName());
+            commentItem.accumulate("comment_content",comment.getGooodComment());
+            commentItem.accumulate("star_count",comment.getStar());
+            commentItems.add(commentItem);
+            star = star.add(new BigDecimal(comment.getStar()));
+            System.out.printf(star.toString());
+        }
+        item.accumulate("comments", commentItems);
+        if(commentsList.size()>0) {
+            item.accumulate("star_number", commentsList.size());
+            item.accumulate("star", star.divide(new BigDecimal(commentsList.size())));
+
+        }
+        else{
+            item.accumulate("star_number", 0);
+            item.accumulate("star", 0);
+        }
+        item.accumulate("good_name",goodsRepository.findByGoodId(id).getGoodName());
+        item.accumulate("status","ok");
+        return item;
+    }
+
+    public JSONObject getSelectOrder(String startTime,String endTime,String username) {
+        Format f = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        Timestamp sTime = new Timestamp(new Date().getTime());
+        Timestamp eTime = new Timestamp(new Date().getTime());
+        if (!startTime.isEmpty()) {
+            Date start = null;
+            try {
+                start = (Date) f.parseObject(startTime + "T00:00:00");
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            sTime = new Timestamp(start.getTime());
+        }
+        if(!endTime.isEmpty()) {
+            Date end = null;
+            try {
+                end = (Date) f.parseObject(endTime + "T23:59:59");
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            eTime = new Timestamp(end.getTime());
+        }
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Stores store = storeRepository.findByDistName(userDetails.getUsername());
+        List<Orders> ordersList = orderRepository.findByStoreId(store.getStoreId());
+        JSONObject result = new JSONObject();
+        JSONArray values = new JSONArray();
+        for(Orders order:ordersList){
+            if ((startTime.equals("") || sTime.compareTo(order.getOrderTime())<=0)
+                    && (endTime.equals("")||eTime.compareTo(order.getOrderTime())>=0)
+                    && (username.equals("")||userRepository.findByUserId(order.getUserId()).getUserName().equals(username))){
+                JSONObject item = new JSONObject();
+                item.accumulate("user_id", order.getUserId());
+                item.accumulate("username", userRepository.findByUserId(order.getUserId()).getUserName());
+                item.accumulate("bill_id", order.getOrderId());
+                item.accumulate("receiver", order.getReceiver());
+                item.accumulate("receiver_phone", order.getRePhone());
+                item.accumulate("receiver_address", order.getReAddress());
+                item.accumulate("transport_method", order.getDeliverMethod());
+                item.accumulate("order_status", order.getStatus());
+                item.accumulate("time",order.getOrderTime().toString());
+                List<OrderItems> orderItemsList = orderitemsRepository.findByOrderId(order.getOrderId());
+                JSONArray goodsList = new JSONArray();
+                for (OrderItems orderItem : orderItemsList) {
+                    Goods good = goodsRepository.findByGoodId(orderItem.getGoodId());
+                    JSONObject goodDetail = new JSONObject();
+                    goodDetail.accumulate("id", orderItem.getGoodId());
+                    goodDetail.accumulate("name", good.getGoodName());
+                    goodDetail.accumulate("store", store.getStoreName());
+                    goodDetail.accumulate("store_id", store.getStoreId());
+                    goodDetail.accumulate("current_price", orderItem.getCurrentPrice());
+                    goodDetail.accumulate("amount", orderItem.getAmount());
+                    goodDetail.accumulate("description", good.getDescription());
+                    goodDetail.accumulate("image_id", good.getGoodImageId());
+                    goodsList.add(goodDetail);
+                }
+                item.accumulate("goods", goodsList);
+                values.add(item);
+            }
+        }
+        values.sort(Comparator.comparing(obj -> ((JSONObject) obj).getString("time")).reversed());
+        result.accumulate("status","ok");
+        result.accumulate("values",values);
+        return result;
+
     }
 }

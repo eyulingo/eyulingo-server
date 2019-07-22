@@ -102,5 +102,4 @@ public class StoreServiceModifyTest {
         assertEquals("自提",storeService.getDeliver().getString("delivery_method"));
     }
 
-
 }

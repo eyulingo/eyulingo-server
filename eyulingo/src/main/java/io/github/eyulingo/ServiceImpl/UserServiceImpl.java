@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.sql.Timestamp;
 
@@ -542,7 +543,7 @@ public class UserServiceImpl implements UserService {
             commentsitem.accumulate("comment_content",goodComments.getGooodComment() );
             commentsitem.accumulate("star_count",goodComments.getStar() );
             comments.add(commentsitem);
-            star.add(new BigDecimal(goodComments.getStar()));
+            star = star.add(new BigDecimal(goodComments.getStar()));
         }
         item.accumulate("comments",comments);
         if(commentsList.size()>0) {
@@ -615,7 +616,7 @@ public class UserServiceImpl implements UserService {
                 commentsitem.accumulate("username", user.getUsername());
                 commentsitem.accumulate("comment_content", storeComments.getStoreComments());
                 commentsitem.accumulate("star_count", storeComments.getStar());
-                star.add(new BigDecimal(storeComments.getStar()));
+                star = star.add(new BigDecimal(storeComments.getStar()));
                 comments.add(commentsitem);
             }
             item.accumulate("comments", comments);
@@ -824,6 +825,7 @@ public class UserServiceImpl implements UserService {
             item.accumulate("receiver_address",order.getReAddress());
             item.accumulate("transport_method",order.getDeliverMethod());
             item.accumulate("order_status",order.getStatus());
+            item.accumulate("generate_time",order.getOrderTime());
             List<OrderItems> orderItemsList = orderitemsRepository.findByOrderId(order.getOrderId());
             JSONArray goodsList = new JSONArray();
             for(OrderItems orderItem:orderItemsList){
@@ -843,6 +845,7 @@ public class UserServiceImpl implements UserService {
             item.accumulate("goods",goodsList);
             values.add(item);
         }
+        values.sort(Comparator.comparing(obj -> ((JSONObject) obj).getString("generate_time")).reversed());
         result.accumulate("status","ok");
         result.accumulate("values",values);
         return result;
@@ -966,4 +969,23 @@ public class UserServiceImpl implements UserService {
         return "{\"status\": \"ok\"}";
     }
 
+
+    public String deleteOrder(JSONObject data) {
+        Long id = data.getLong("order_id");
+        Orders order = orderRepository.findByOrderId(id);
+        if(order == null){
+            return "{\"status\": \"订单不存在\"}";
+        }
+        if(order.getStatus().equals("unpurchased")){
+            List<OrderItems> list = orderitemsRepository.findByOrderId(id);
+            for(OrderItems orderItems:list){
+                orderitemsRepository.delete(orderItems);
+            }
+            orderRepository.delete(order);
+            return "{\"status\": \"ok\"}";
+        }
+        else{
+            return "{\"status\": \"无法删除\"}";
+        }
+    }
 }
