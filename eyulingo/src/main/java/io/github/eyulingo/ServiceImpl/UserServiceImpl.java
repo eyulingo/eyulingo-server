@@ -800,6 +800,7 @@ public class UserServiceImpl implements UserService {
                     orderitemsRepository.save(orderItem);
                     Goods changed_good = goodsRepository.findByGoodId(goodsId.get(i));
                     changed_good.setStorage(changed_good.getStorage()-goodsAmount.get(i));
+                    goodsRepository.save(changed_good);
                     cost = goodsRepository.findByGoodId(goodsId.get(i)).getPrice().multiply(new BigDecimal(goodsAmount.get(i))).add(cost);
                 }
             }
@@ -979,6 +980,8 @@ public class UserServiceImpl implements UserService {
         if(order.getStatus().equals("unpurchased")){
             List<OrderItems> list = orderitemsRepository.findByOrderId(id);
             for(OrderItems orderItems:list){
+                Goods good = goodsRepository.findByGoodId(orderItems.getGoodId());
+                good.setStorage(good.getStorage()+orderItems.getAmount());
                 orderitemsRepository.delete(orderItems);
             }
             orderRepository.delete(order);
