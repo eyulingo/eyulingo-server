@@ -65,4 +65,12 @@ public interface UserService {
 
     public String deleteOrder(JSONObject data);
 
+    public JSONObject storeByOrders(String data);
+
+    public JSONObject storeByStar(String data);
+
+    public JSONObject storeByDistance(String data,double longitude,double latitude);
+
+    public String orderComment(JSONObject data);
+
 }

@@ -788,6 +788,7 @@ public class UserServiceImpl implements UserService {
             order.setUserId(currentUser.getUserId());
             order.setStoreId(store_id);
             order.setRePhone(receive_phone);
+            order.setRated(false);
             orderRepository.save(order);
             orderId.add(order.getOrderId());
             for(int i = 0;i<size;i++){
@@ -827,6 +828,11 @@ public class UserServiceImpl implements UserService {
             item.accumulate("transport_method",order.getDeliverMethod());
             item.accumulate("order_status",order.getStatus());
             item.accumulate("generate_time",order.getOrderTime().toString());
+            item.accumulate("rated",order.getRated());
+            if(order.getRated()){
+                item.accumulate("star_count",order.getRateLevel());
+                item.accumulate("comment_content",order.getCommentContent());
+            }
             List<OrderItems> orderItemsList = orderitemsRepository.findByOrderId(order.getOrderId());
             JSONArray goodsList = new JSONArray();
             for(OrderItems orderItem:orderItemsList){
@@ -989,6 +995,124 @@ public class UserServiceImpl implements UserService {
         }
         else{
             return "{\"status\": \"无法删除\"}";
+        }
+    }
+
+    public JSONObject storeByOrders(String data){
+        List<Stores> storesList =  storeRepository.findAll();
+        List<JSONObject> okStores = new ArrayList();
+        for(Stores store:storesList){
+            String storename = store.getStoreName();
+            if(storename.contains(data)){
+                JSONObject item = new JSONObject();
+                item.accumulate("id",store.getStoreId());
+                item.accumulate("name",store.getStoreName());
+                item.accumulate("address",store.getStoreAddress());
+                item.accumulate("starttime",store.getStartTime());
+                item.accumulate("endtime",store.getEndTime());
+                item.accumulate("image_id",store.getCoverId());
+                item.accumulate("orders",orderRepository.findByStoreId(store.getStoreId()).size());
+                okStores.add(item);
+            }
+        }
+        okStores.sort(Comparator.comparing(obj -> ((JSONObject) obj).getString("orders")).reversed());
+        JSONObject result = new JSONObject();
+        result.accumulate("status","ok");
+        result.accumulate("values",okStores);
+        return  result;
+    }
+
+    public JSONObject storeByStar(String data){
+        List<Stores> storesList =  storeRepository.findAll();
+        List<JSONObject> okStores = new ArrayList();
+        for(Stores store:storesList){
+            String storename = store.getStoreName();
+            if(storename.contains(data)){
+                JSONObject item = new JSONObject();
+                item.accumulate("id",store.getStoreId());
+                item.accumulate("name",store.getStoreName());
+                item.accumulate("address",store.getStoreAddress());
+                item.accumulate("starttime",store.getStartTime());
+                item.accumulate("endtime",store.getEndTime());
+                item.accumulate("image_id",store.getCoverId());
+                List<StoreComments> commentsList = storeCommentsRepository.findByStoreId(store.getStoreId());
+                BigDecimal star = new BigDecimal(0);
+                for (StoreComments storeComments : commentsList) {
+                    star = star.add(new BigDecimal(storeComments.getStar()));
+                }
+                if(commentsList.size()>0) {
+                    item.accumulate("star_number", commentsList.size());
+                    item.accumulate("star", star.floatValue()/(float)commentsList.size());
+                }
+                else{
+                    item.accumulate("star_number", 0);
+                    item.accumulate("star", 0);
+                }
+
+                okStores.add(item);
+            }
+        }
+        okStores.sort(Comparator.comparing(obj -> ((JSONObject) obj).getDouble("star_number")).reversed());
+        okStores.sort(Comparator.comparing(obj -> ((JSONObject) obj).getDouble("star")).reversed());
+        JSONObject result = new JSONObject();
+        result.accumulate("status","ok");
+        result.accumulate("values",okStores);
+        return  result;
+    }
+
+    private static double EARTH_RADIUS = 6378.137;
+
+    private static double rad(double d) {
+        return d * Math.PI / 180.0;
+
+    }
+
+    public static double getDistance(double lat1, double lng1, double lat2,	double lng2) {
+        double radLat1 = rad(lat1);
+        double radLat2 = rad(lat2);
+        double a = radLat1 - radLat2;
+        double b = rad(lng1) - rad(lng2);
+        double s = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(a / 2), 2)	+ Math.cos(radLat1) * Math.cos(radLat2)	* Math.pow(Math.sin(b / 2), 2)));
+        s = s * EARTH_RADIUS;
+        s = Math.round(s * 10000d) / 10000d;
+        return s;
+    }
+
+    public JSONObject storeByDistance(String data,double longitude,double latitude){
+        List<Stores> storesList =  storeRepository.findAll();
+        List<JSONObject> okStores = new ArrayList();
+        for(Stores store:storesList){
+            String storename = store.getStoreName();
+            if(storename.contains(data)){
+                JSONObject item = new JSONObject();
+                item.accumulate("id",store.getStoreId());
+                item.accumulate("name",store.getStoreName());
+                item.accumulate("address",store.getStoreAddress());
+                item.accumulate("starttime",store.getStartTime());
+                item.accumulate("endtime",store.getEndTime());
+                item.accumulate("image_id",store.getCoverId());
+                item.accumulate("distance",getDistance(latitude,longitude,store.getLatitude(),store.getLongitude()));
+                okStores.add(item);
+            }
+        }
+        okStores.sort(Comparator.comparing(obj -> ((JSONObject) obj).getString("distance")));
+        JSONObject result = new JSONObject();
+        result.accumulate("status","ok");
+        result.accumulate("values",okStores);
+        return  result;
+    }
+
+    public String orderComment(JSONObject data){
+        Orders order = orderRepository.findByOrderId(data.getLong("order_id"));
+        if(order.getStatus().equals("received")){
+            order.setRated(true);
+            order.setRateLevel(data.getLong("star_count"));
+            order.setCommentContent(data.getString("comment_content"));
+            orderRepository.save(order);
+            return "{\"status\": \"ok\"}";
+        }
+        else{
+            return "{\"status\": \"未完成订单无法评价\"}";
         }
     }
 }
