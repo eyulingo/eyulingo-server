@@ -1,3 +1,14 @@
+
+SET GLOBAL time_zone = "+8:00";
+
+DROP DATABASE IF EXISTS `eyulingo_db`;
+
+CREATE DATABASE IF NOT EXISTS `eyulingo_db` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+
+ALTER DATABASE `eyulingo_db` CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
+USE `eyulingo_db`;
+
 -- MySQL dump 10.13  Distrib 5.7.17, for macos10.12 (x86_64)
 --
 -- Host: localhost    Database: eyulingo_db
