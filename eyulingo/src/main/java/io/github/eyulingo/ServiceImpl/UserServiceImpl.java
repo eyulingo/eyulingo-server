@@ -548,7 +548,7 @@ public class UserServiceImpl implements UserService {
         item.accumulate("comments",comments);
         if(commentsList.size()>0) {
             item.accumulate("star_number", commentsList.size());
-            item.accumulate("star", star.divide(new BigDecimal(commentsList.size())));
+            item.accumulate("star", star.floatValue()/(float)commentsList.size());
         }
         else{
             item.accumulate("star_number", 0);
@@ -622,7 +622,7 @@ public class UserServiceImpl implements UserService {
             item.accumulate("comments", comments);
             if(commentsList.size()>0) {
                 item.accumulate("star_number", commentsList.size());
-                item.accumulate("star", star.divide(new BigDecimal(commentsList.size())));
+                item.accumulate("star", star.floatValue()/(float)commentsList.size());
             }
             else{
                 item.accumulate("star_number", 0);
