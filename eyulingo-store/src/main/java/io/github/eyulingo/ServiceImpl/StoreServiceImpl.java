@@ -434,6 +434,16 @@ public class StoreServiceImpl implements StoreService {
         if(order.getStatus().equals("unpurchased")){
            return "{\"status\": \"订单不存在\"}";
         }
+        if(status.equals("invalid")){
+            List<OrderItems> list = orderitemsRepository.findByOrderId(id);
+            for(OrderItems orderItems:list){
+                Goods good = goodsRepository.findByGoodId(orderItems.getGoodId());
+                good.setStorage(good.getStorage()+orderItems.getAmount());
+                orderitemsRepository.delete(orderItems);
+            }
+            orderRepository.delete(order);
+            return "{\"status\": \"ok\"}";
+        }
         order.setStatus(status);
         orderRepository.save(order);
         return "{\"status\": \"ok\"}";

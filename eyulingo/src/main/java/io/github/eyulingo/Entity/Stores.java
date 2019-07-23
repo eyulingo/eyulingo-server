@@ -54,9 +54,31 @@ public class Stores implements UserDetails {
     @Column(name = "deliver_method")
     private String deliverMethod;
 
+    @Column(name = "longitude")
+    private double longitude;
+
+    @Column(name = "latitude")
+    private double latitude;
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
     public Stores(){
 
     }
+
     public void setStoreId(Long storeId) {
         this.storeId = storeId;
     }

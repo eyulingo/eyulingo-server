@@ -33,6 +33,40 @@ public class Orders {
     @Column(name = "order_time")
     private Timestamp orderTime;
 
+    @Column(name = "rated")
+    private  Boolean rated;
+
+    @Column(name = "rate_level")
+    private  float rateLevel;
+
+    @Column(name = "comment_content")
+    private String commentContent;
+
+    public Boolean getRated() {
+        return rated;
+    }
+
+    public float getRateLevel() {
+        return rateLevel;
+    }
+
+    public String getCommentContent() {
+        return commentContent;
+    }
+
+    public void setCommentContent(String commentContent) {
+        this.commentContent = commentContent;
+    }
+
+    public void setRated(Boolean rated) {
+        this.rated = rated;
+    }
+
+    public void setRateLevel(float rateLevel) {
+        this.rateLevel = rateLevel;
+    }
+
+
     public Orders(){
 
     }
