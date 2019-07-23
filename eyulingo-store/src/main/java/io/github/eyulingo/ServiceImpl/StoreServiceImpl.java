@@ -177,7 +177,7 @@ public class StoreServiceImpl implements StoreService {
         }
         if(commentsList.size()>0) {
             item.accumulate("star_number", commentsList.size());
-            item.accumulate("star", star.divide(new BigDecimal(commentsList.size())));
+            item.accumulate("star", star.floatValue()/(float)commentsList.size());
         }
         else{
             item.accumulate("star_number", 0);
@@ -457,7 +457,7 @@ public class StoreServiceImpl implements StoreService {
         item.accumulate("comments", commentItems);
         if(commentsList.size()>0) {
             item.accumulate("star_number", commentsList.size());
-            item.accumulate("star", star.divide(new BigDecimal(commentsList.size())));
+            item.accumulate("star", star.floatValue()/(float)commentsList.size());
 
         }
         else{
