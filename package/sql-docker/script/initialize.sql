@@ -8,7 +8,6 @@ CREATE DATABASE IF NOT EXISTS `eyulingo_db` /*!40100 DEFAULT CHARACTER SET utf8m
 ALTER DATABASE `eyulingo_db` CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 USE `eyulingo_db`;
-
 -- MySQL dump 10.13  Distrib 5.7.17, for macos10.12 (x86_64)
 --
 -- Host: localhost    Database: eyulingo_db
@@ -233,6 +232,7 @@ CREATE TABLE `orders` (
   `rated` tinyint(4) DEFAULT NULL,
   `rate_level` int(5) DEFAULT NULL,
   `comment_content` varchar(1024) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `store_id` int(11) NOT NULL,
   PRIMARY KEY (`order_id`),
   KEY `user_id` (`user_id`),
   KEY `deliver_method` (`deliver_method`),
@@ -406,4 +406,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-07-23 12:39:51
+-- Dump completed on 2019-07-23 15:08:11
