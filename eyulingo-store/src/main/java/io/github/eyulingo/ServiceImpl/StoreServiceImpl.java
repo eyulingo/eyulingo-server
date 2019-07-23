@@ -402,6 +402,11 @@ public class StoreServiceImpl implements StoreService {
                 item.accumulate("transport_method", order.getDeliverMethod());
                 item.accumulate("order_status", order.getStatus());
                 item.accumulate("time", order.getOrderTime().toString());
+                item.accumulate("rated",order.getRated());
+                if(order.getRated()){
+                    item.accumulate("star_count",order.getRateLevel());
+                    item.accumulate("comment_content",order.getCommentContent());
+                }
                 List<OrderItems> orderItemsList = orderitemsRepository.findByOrderId(order.getOrderId());
                 JSONArray goodsList = new JSONArray();
                 for (OrderItems orderItem : orderItemsList) {

@@ -470,9 +470,17 @@ public class UserServiceImpl implements UserService {
     public JSONObject searchGoods(String data){
         List<Goods> goodsList =  goodsRepository.findAll();
         List<JSONObject> okGoods = new ArrayList();
+        List<Goods> goods = new ArrayList<>();
         for(Goods good:goodsList){
+            Boolean isTags = false;
             String goodname = good.getGoodName();
-            if(goodname.contains(data) && good.getHidden() == false && !data.isEmpty() ){
+            List<Tags> tagsList = tagsRepository.findByGoodId(good.getGoodId());
+            for(Tags tag:tagsList){
+                if(tag.getTagName().equals(data)){
+                    isTags = true;
+                }
+            }
+            if((goodname.contains(data) && good.getHidden() == false && !data.isEmpty()) || isTags){
                 JSONObject item = new JSONObject();
                 item.accumulate("id",good.getGoodId());
                 item.accumulate("name",good.getGoodName());
@@ -490,6 +498,37 @@ public class UserServiceImpl implements UserService {
                 }
                 item.accumulate("tags",taglist);
                 okGoods.add(item);
+                goods.add(good);
+            }
+        }
+        String [] partName = data.split("\\s+");
+        for(Goods good:goodsList){
+            Boolean isPartName = false;
+            String goodname = good.getGoodName();
+            for(String name:partName){
+                if(goodname.contains(name) && !name.isEmpty()){
+                    isPartName = true;
+                }
+            }
+            if(isPartName && !goods.contains(good)){
+                JSONObject item = new JSONObject();
+                item.accumulate("id",good.getGoodId());
+                item.accumulate("name",good.getGoodName());
+                item.accumulate("store",storeRepository.findByStoreId(good.getStoreId()).getStoreName());
+                item.accumulate("store_id",good.getStoreId());
+                item.accumulate("price",good.getPrice());
+                item.accumulate("coupon_price",good.getDiscount());
+                item.accumulate("storage",good.getStorage());
+                item.accumulate("description",good.getDescription());
+                item.accumulate("image_id",good.getGoodImageId());
+                List<Tags> tags = tagsRepository.findByGoodId(good.getGoodId());
+                List<String> taglist = new ArrayList<String>();
+                for(Tags tag:tags){
+                    taglist.add(tag.getTagName());
+                }
+                item.accumulate("tags",taglist);
+                okGoods.add(item);
+                goods.add(good);
             }
         }
         JSONObject result = new JSONObject();
@@ -554,6 +593,12 @@ public class UserServiceImpl implements UserService {
             item.accumulate("star_number", 0);
             item.accumulate("star", 0);
         }
+        List<Tags> tagsList = tagsRepository.findByGoodId(good.getGoodId());
+        List<String> list = new ArrayList<String>();
+        for(Tags tag:tagsList){
+            list.add(tag.getTagName());
+        }
+        item.accumulate("tags",list);
         item.accumulate("status","ok");
         return item;
     }
