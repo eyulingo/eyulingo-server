@@ -230,7 +230,9 @@ CREATE TABLE `orders` (
   `deliver_method` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `status` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `order_time` timestamp NULL DEFAULT NULL,
+  `rated` tinyint(4) DEFAULT NULL,
   `rate_level` int(5) DEFAULT NULL,
+  `comment_content` varchar(1024) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`order_id`),
   KEY `user_id` (`user_id`),
   KEY `deliver_method` (`deliver_method`),
@@ -404,4 +406,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-07-23 12:13:10
+-- Dump completed on 2019-07-23 12:39:51
