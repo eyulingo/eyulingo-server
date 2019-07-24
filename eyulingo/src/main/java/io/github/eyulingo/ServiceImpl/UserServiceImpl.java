@@ -671,6 +671,8 @@ public class UserServiceImpl implements UserService {
                 item.accumulate("provider_avatar", dist_image);
             }
 
+            item.accumulate("lat",store.getLatitude());
+            item.accumulate("lng",store.getLongitude());
             List<StoreComments> commentsList = storeCommentsRepository.findByStoreId(store.getStoreId());
             JSONArray comments = new JSONArray();
             BigDecimal star = new BigDecimal(0);
