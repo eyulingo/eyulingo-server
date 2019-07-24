@@ -57,9 +57,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 // 定义登出操作
                 .logout().logoutSuccessUrl("/kickout").permitAll().and()
                 .csrf().disable()
+                .authorizeRequests()
+
         ;
         // 禁用缓存
         httpSecurity.headers().cacheControl();
+        httpSecurity.sessionManagement().maximumSessions(1).expiredUrl("/failure");
     }
 
     @Bean
