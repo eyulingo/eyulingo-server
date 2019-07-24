@@ -7,7 +7,7 @@ echo "Starting eyulingo-android Unit Tests"
 # Put unit test code here
 # 
 
-./eyulingo/mvnw clean install -DskipTests=true
+./eyulingo/mvnw clean install
 
 ./eyulingo/mvnw test
 
