@@ -1,1 +1,1 @@
-./package/sql-docker/script/add_example_data.sql linguist-generated=true
+*.sql linguist-generated=true
