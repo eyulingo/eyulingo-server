@@ -56,7 +56,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     OrderitemsRepository orderitemsRepository;
 
-    public JSONObject getCheckCode(JSONObject data){
+    public JSONObject getCheckCode(JSONObject data){/*获取验证码*/
         Date now = new Date();
         Date beforeDate = new Date(now.getTime()-180000);
         Timestamp getDate = new Timestamp(beforeDate.getTime());
@@ -118,7 +118,7 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    public String register(JSONObject data) {
+    public String register(JSONObject data) {/*注册*/
         String email = data.getString("email");
         String username = data.getString("username");
         String password = data.getString("password");
@@ -178,7 +178,7 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    public JSONObject getMe() {
+    public JSONObject getMe() {/*获取个人信息*/
         try {
             UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             Users currentUser = userRepository.findByUserName(userDetails.getUsername());
@@ -211,7 +211,6 @@ public class UserServiceImpl implements UserService {
     }
 
     public String changePassword(JSONObject data){
-
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Users currentUser = userRepository.findByUserName(userDetails.getUsername());
         if(data.getString("new_password").isEmpty() || data.getString("origin_password").isEmpty() || data.getString("confirm_new_password").isEmpty()){

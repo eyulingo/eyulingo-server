@@ -56,6 +56,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         ;
         // 禁用缓存
         httpSecurity.headers().cacheControl();
+        httpSecurity.sessionManagement().maximumSessions(1).expiredUrl("/failure");
     }
 
     @Bean

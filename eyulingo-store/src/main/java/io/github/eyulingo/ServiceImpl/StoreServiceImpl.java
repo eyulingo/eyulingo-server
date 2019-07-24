@@ -325,7 +325,7 @@ public class StoreServiceImpl implements StoreService {
         if(!data.getString("image_id").isEmpty()) {
             good.setGoodImageId(data.getString("image_id"));
         }
-        if(!data.getString("name").isEmpty()) {
+        if(!data.getString("name").isEmpty()){
             good.setGoodName(data.getString("name"));
         }
         Long price = data.getLong("price");
@@ -548,6 +548,5 @@ public class StoreServiceImpl implements StoreService {
         result.accumulate("status","ok");
         result.accumulate("values",values);
         return result;
-
     }
 }
