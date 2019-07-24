@@ -105,5 +105,18 @@ public class Users implements UserDetails {
         return true;
     }
 
+    @Override
+    public boolean equals(Object rhs) {
+        return rhs instanceof Users ? this.userName.equals(((Users)rhs).userName) : false;
+    }
+
+    /**
+     * Returns the hashcode of the {@code username}.
+     */
+    @Override
+    public int hashCode() {
+        return userName.hashCode();
+    }
+
 }
 

@@ -539,6 +539,7 @@ public class UserServiceImpl implements UserService {
     public JSONObject searchStore(String data){
         List<Stores> storesList =  storeRepository.findAll();
         List<JSONObject> okStores = new ArrayList();
+        List<Stores> stores = new ArrayList<>();
         for(Stores store:storesList){
             String storename = store.getStoreName();
             if(storename.contains(data) && !data.isEmpty()){
@@ -550,6 +551,28 @@ public class UserServiceImpl implements UserService {
                 item.accumulate("endtime",store.getEndTime());
                 item.accumulate("image_id",store.getCoverId());
                 okStores.add(item);
+                stores.add(store);
+            }
+        }
+        String [] partName = data.split("\\s+");
+        for(Stores store:storesList){
+            String storename = store.getStoreName();
+            Boolean isPartName = false;
+            for(String name:partName){
+                if(storename.contains(name)){
+                    isPartName = true;
+                }
+            }
+            if(isPartName && !data.isEmpty() &&!stores.contains(store)){
+                JSONObject item = new JSONObject();
+                item.accumulate("id",store.getStoreId());
+                item.accumulate("name",store.getStoreName());
+                item.accumulate("address",store.getStoreAddress());
+                item.accumulate("starttime",store.getStartTime());
+                item.accumulate("endtime",store.getEndTime());
+                item.accumulate("image_id",store.getCoverId());
+                okStores.add(item);
+                stores.add(store);
             }
         }
         JSONObject result = new JSONObject();
@@ -1059,7 +1082,7 @@ public class UserServiceImpl implements UserService {
                 okStores.add(item);
             }
         }
-        okStores.sort(Comparator.comparing(obj -> ((JSONObject) obj).getString("orders")).reversed());
+        okStores.sort(Comparator.comparing(obj -> ((JSONObject) obj).getLong("orders")).reversed());
         JSONObject result = new JSONObject();
         result.accumulate("status","ok");
         result.accumulate("values",okStores);
@@ -1139,7 +1162,7 @@ public class UserServiceImpl implements UserService {
                 okStores.add(item);
             }
         }
-        okStores.sort(Comparator.comparing(obj -> ((JSONObject) obj).getString("distance")));
+        okStores.sort(Comparator.comparing(obj -> ((JSONObject) obj).getDouble("distance")));
         JSONObject result = new JSONObject();
         result.accumulate("status","ok");
         result.accumulate("values",okStores);

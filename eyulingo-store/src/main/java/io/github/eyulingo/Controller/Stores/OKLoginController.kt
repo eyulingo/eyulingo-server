@@ -9,6 +9,7 @@ class OKLoginController {
     @RequestMapping(value = ["/ok"], method = [RequestMethod.GET], produces = ["application/json;charset=UTF-8"])
     @ResponseBody
     fun adminModifyDist(): String {
+
         return "{\"status\": \"ok\"}"
     }
 }
