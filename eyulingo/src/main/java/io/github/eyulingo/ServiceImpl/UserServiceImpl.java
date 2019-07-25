@@ -479,7 +479,7 @@ public class UserServiceImpl implements UserService {
                     isTags = true;
                 }
             }
-            if((goodname.contains(data) && good.getHidden() == false && !data.isEmpty()) || isTags){
+            if((goodname.contains(data) && !good.getHidden() && !data.isEmpty()) || isTags){
                 JSONObject item = new JSONObject();
                 item.accumulate("id",good.getGoodId());
                 item.accumulate("name",good.getGoodName());
@@ -500,6 +500,7 @@ public class UserServiceImpl implements UserService {
                 goods.add(good);
             }
         }
+        okGoods.sort(Comparator.comparing(obj -> ((JSONObject) obj).getLong("id")).reversed());
         String [] partName = data.split("\\s+");
         for(Goods good:goodsList){
             Boolean isPartName = false;
@@ -509,7 +510,7 @@ public class UserServiceImpl implements UserService {
                     isPartName = true;
                 }
             }
-            if(isPartName && !goods.contains(good)){
+            if(isPartName && !goods.contains(good) && !good.getHidden()){
                 JSONObject item = new JSONObject();
                 item.accumulate("id",good.getGoodId());
                 item.accumulate("name",good.getGoodName());
