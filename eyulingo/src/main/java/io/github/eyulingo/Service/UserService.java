@@ -73,4 +73,6 @@ public interface UserService {
 
     public String orderComment(JSONObject data);
 
+    public JSONObject tags();
+
 }

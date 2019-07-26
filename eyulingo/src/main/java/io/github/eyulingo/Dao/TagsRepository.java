@@ -11,5 +11,6 @@ import java.util.List;
 @Repository
 public interface TagsRepository extends CrudRepository<Tags,Long> {
     List<Tags> findByGoodId(Long goodId);
+    List<Tags> findAll();
     Tags findByGoodIdAndAndTagName(Long goodId,String tagName);
 }
