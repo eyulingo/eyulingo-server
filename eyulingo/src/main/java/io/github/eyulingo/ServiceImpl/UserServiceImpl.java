@@ -12,14 +12,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
+import java.util.*;
 import java.sql.Timestamp;
-
-
-
-import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -467,6 +461,8 @@ public class UserServiceImpl implements UserService {
     }
 
     public JSONObject searchGoods(String data){
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Users currentUser = userRepository.findByUserName(userDetails.getUsername());
         List<Goods> goodsList =  goodsRepository.findAll();
         List<JSONObject> okGoods = new ArrayList();
         List<Goods> goods = new ArrayList<>();
@@ -479,7 +475,7 @@ public class UserServiceImpl implements UserService {
                     isTags = true;
                 }
             }
-            if((goodname.contains(data) && !good.getHidden() && !data.isEmpty()) || isTags){
+            if((goodname.contains(data)|| isTags) && !good.getHidden() && !data.isEmpty() ){
                 JSONObject item = new JSONObject();
                 item.accumulate("id",good.getGoodId());
                 item.accumulate("name",good.getGoodName());
@@ -533,8 +529,118 @@ public class UserServiceImpl implements UserService {
         }
         JSONObject result = new JSONObject();
         result.accumulate("status","ok");
-        result.accumulate("values",okGoods);
-        return  result;
+        if(okGoods.size() == 0) {
+            result.remove("status");
+            result.accumulate("status","推荐商品");
+            List<Orders> isBuy = orderRepository.findByUserId(currentUser.getUserId());
+            System.out.printf(isBuy.toString());
+            List<String> oldTagsList = new ArrayList<>();
+            if(isBuy.size()<1) {
+                List<Goods> allGoods = goodsRepository.findAll();
+                Random rand = new Random();
+                int i = 0;
+                List<Integer> ints = new ArrayList<>();
+                while(i<5 && i<allGoods.size()){
+                    int randNum = rand.nextInt(allGoods.size());
+                    Goods good = allGoods.get(randNum);
+                    if(!ints.contains(randNum) && !good.getHidden()){
+                        JSONObject item = new JSONObject();
+                        item.accumulate("id", good.getGoodId());
+                        item.accumulate("name", good.getGoodName());
+                        item.accumulate("store", storeRepository.findByStoreId(good.getStoreId()).getStoreName());
+                        item.accumulate("store_id", good.getStoreId());
+                        item.accumulate("price", good.getPrice());
+                        item.accumulate("coupon_price", good.getDiscount());
+                        item.accumulate("storage", good.getStorage());
+                        item.accumulate("description", good.getDescription());
+                        item.accumulate("image_id", good.getGoodImageId());
+                        List<Tags> tags = tagsRepository.findByGoodId(good.getGoodId());
+                        List<String> taglist = new ArrayList<String>();
+                        for (Tags tag : tags) {
+                            taglist.add(tag.getTagName());
+                        }
+                        item.accumulate("tags", taglist);
+                        okGoods.add(item);
+                        i++;
+                        ints.add(randNum);
+                    }
+                }
+            }
+            else{
+                List<Tags> tagsList = new ArrayList<>();
+                for (Orders haveBuy : isBuy) {
+                    List<OrderItems> orderItemsList = orderitemsRepository.findByOrderId(haveBuy.getOrderId());
+                    for (OrderItems orderItems : orderItemsList) {
+                        List<Tags> tagList = tagsRepository.findByGoodId(orderItems.getGoodId());
+                        for(Tags addTags:tagList){
+                            tagsList.add(addTags);
+                        }
+                    }
+
+                }
+                Random rands = new Random();
+                for (int i1 = 0;i1<20;i1++) {
+                    int randTag = rands.nextInt(tagsList.size());
+                    Tags tags = tagsList.get(randTag);
+                    if(!oldTagsList.contains(tags.getTagName())) {
+                        oldTagsList.add(tags.getTagName());
+                    }
+                }
+                System.out.printf(oldTagsList.toString());
+                Long goodAmount = new Long(0);
+                for(String tags:oldTagsList){
+                    Long tagLong = new Long(0);
+                    List<Goods> allGoods = goodsRepository.findAll();
+                    Random rand = new Random();
+                    List<Integer> ints = new ArrayList<>();
+                    for (int i = 0;i<allGoods.size();) {
+                        int randNum = rand.nextInt(allGoods.size());
+                        if(!ints.contains(randNum)){
+                            Goods good = allGoods.get(randNum);
+                            Boolean isTags = false;
+                            List<Tags> searchTagsList = tagsRepository.findByGoodId(good.getGoodId());
+                            for (Tags tag : searchTagsList) {
+                                if (tag.getTagName().equals(tags)) {
+                                    isTags = true;
+                                }
+                            }
+                            if (!good.getHidden() && isTags && !goods.contains(good)) {
+                                JSONObject item = new JSONObject();
+                                item.accumulate("id", good.getGoodId());
+                                item.accumulate("name", good.getGoodName());
+                                item.accumulate("store", storeRepository.findByStoreId(good.getStoreId()).getStoreName());
+                                item.accumulate("store_id", good.getStoreId());
+                                item.accumulate("price", good.getPrice());
+                                item.accumulate("coupon_price", good.getDiscount());
+                                item.accumulate("storage", good.getStorage());
+                                item.accumulate("description", good.getDescription());
+                                item.accumulate("image_id", good.getGoodImageId());
+                                List<Tags> newTags = tagsRepository.findByGoodId(good.getGoodId());
+                                List<String> taglist = new ArrayList<String>();
+                                for (Tags tag : newTags) {
+                                    taglist.add(tag.getTagName());
+                                }
+                                item.accumulate("tags", taglist);
+                                okGoods.add(item);
+                                goods.add(good);
+                                tagLong++;
+                                goodAmount++;
+                            }
+                            if(tagLong == 2){
+                                break;
+                            }
+                            i++;
+                            ints.add(randNum);
+                        }
+
+                    }
+                    if(goodAmount == 6){
+                        break;
+                    }
+                }
+            }
+        }
+        result.accumulate("values",okGoods);return  result;
     }
 
     public JSONObject searchStore(String data){
@@ -1184,5 +1290,31 @@ public class UserServiceImpl implements UserService {
         else{
             return "{\"status\": \"未完成订单无法评价\"}";
         }
+    }
+
+    public JSONObject tags(){
+        List<Tags> tags = tagsRepository.findAll();
+        List<String> alltags = new ArrayList<>();
+        for(Tags tag:tags){
+            if(!alltags.contains(tag.getTagName())){
+                alltags.add(tag.getTagName());
+            }
+        }
+        Random rand = new Random();
+        int i = 0;
+        List<Integer> ints = new ArrayList<>();
+        List<String> values = new ArrayList<>();
+        while(i<5 && i<alltags.size()) {
+            int randNum = rand.nextInt(alltags.size());
+            if(!ints.contains(randNum) && !values.contains(alltags.get(randNum))){
+                ints.add(randNum);
+                values.add(alltags.get(randNum));
+                i++;
+            }
+        }
+        JSONObject item = new JSONObject();
+        item.accumulate("status","ok");
+        item.accumulate("tags",values);
+        return item;
     }
 }
