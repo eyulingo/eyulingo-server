@@ -88,7 +88,8 @@ CREATE TABLE `checkcodes` (
   `email_addr` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `check_code` varchar(8) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `time` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`email_addr`)
+  `type` int(3) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`email_addr`,`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
