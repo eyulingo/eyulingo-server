@@ -20,6 +20,8 @@ import io.github.eyulingo.Dao.AdminRepository;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 @Service
@@ -35,6 +37,42 @@ public class AdminServiceImpl implements AdminService{
 
     @Autowired
     TagsRepository tagsRepository;
+
+
+    public static Boolean checkPhone(String phone) {
+
+
+        if (null == phone || "".equalsIgnoreCase(phone)) {
+
+            return false;
+        } else {
+            if (phone.length() != 11) {
+                return false;
+            }
+            String regex = "^((13[0-9])|(14[5,7,9])|(15([0-3]|[5-9]))|(17[0,1,3,5,6,7,8])|(18[0-9])|(19[8|9])|(16[6]))\\d{8}$";
+            // String regex1 = "/0\\d{2,3}-\\d{7,8}/";座机
+            Pattern p = Pattern.compile(regex);
+            Matcher m = p.matcher(phone);
+            boolean isMatch = m.matches();
+            if (!isMatch) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static Boolean checkTime(String time) {
+
+
+            String regex = "([01][0-9]|2[0-3]):[0-5][0-9]";
+            // String regex1 = "/0\\d{2,3}-\\d{7,8}/";座机
+            Pattern p = Pattern.compile(regex);
+            Matcher m = p.matcher(time);
+            boolean isMatch = m.matches();
+            return isMatch;
+    }
+
+
 
 
 
@@ -107,22 +145,26 @@ public class AdminServiceImpl implements AdminService{
 
     public String modifyStores(JSONObject data){
         try {
-            System.out.println(data);
             Stores store = storeRepository.findByStoreId(data.getLong("store_id"));
+            String name = data.getString("name");
+            Stores stores = storeRepository.findByStoreName(name);
+            if(stores != null && !name.equals(store.getStoreName())){
+                return "{\"status\": \"店铺名已存在\"}";
+            }
             String address = data.getString("address");
             if(!address.isEmpty()){
                 store.setStoreAddress(address);
             }
-            String name = data.getString("name");
+
             if(!name.isEmpty()){
                 store.setStoreName(name);
             }
             String starttime = data.getString("starttime");
-            if(!starttime.isEmpty()){
+            if(!starttime.isEmpty() && checkTime(starttime)){
                 store.setStartTime(starttime);
             }
             String endtime = data.getString("endtime");
-            if(!endtime.isEmpty()){
+            if(!endtime.isEmpty() && checkTime(endtime)){
                 store.setEndTime(endtime);
             }
 
@@ -140,26 +182,32 @@ public class AdminServiceImpl implements AdminService{
     }
 
     public String modifyDist(JSONObject data) {
-
-        try {
             System.out.println(data);
             Stores store = storeRepository.findByStoreId(data.getLong("store_id"));
-
+            String truename = data.getString("truename");
+            Stores stores = storeRepository.findByDistName(truename);
+            if(stores != null && !truename.equals(store.getDistName())){
+                return "{\"status\": \"已存在的用户名\"}";
+            }
+            String dist_phone_nu = data.getString("dist_phone_nu");
+            if (!checkPhone(dist_phone_nu)) {
+                return "{\"status\": \"电话号码格式错误\"}";
+            }
             String location = data.getString("location");
             if (!location.isEmpty()) {
                 store.setDistLocation(location);
             }
 
-            String truename = data.getString("truename");
+
             if (!location.isEmpty()) {
                 store.setDistName(truename);
             }
 
 
-            String dist_phone_nu = data.getString("dist_phone_nu");
             if (!location.isEmpty()) {
                 store.setDistPhone(dist_phone_nu);
             }
+
 
             String password = data.getString("password");
             if (!location.isEmpty()) {
@@ -168,10 +216,7 @@ public class AdminServiceImpl implements AdminService{
 
             storeRepository.save(store);
             return "{\"status\": \"ok\"}";
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return "{\"status\": \"internal_error\"}";
-        }
+
     }
 
 
