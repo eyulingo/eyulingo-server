@@ -75,4 +75,6 @@ public interface UserService {
 
     public JSONObject tags();
 
+    public String confirmOrder(JSONObject data);
+
 }

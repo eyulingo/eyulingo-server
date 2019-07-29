@@ -10,4 +10,5 @@ import java.util.List;
 @Repository
 public interface CheckCodeRepository extends JpaRepository<CheckCodes,String> {
     List<CheckCodes> findByUserEmail(String email);
+    List<CheckCodes> findByUserEmailAndType(String email,Long type);
 }
