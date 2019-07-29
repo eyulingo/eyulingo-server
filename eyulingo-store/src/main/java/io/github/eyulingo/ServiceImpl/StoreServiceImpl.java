@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class StoreServiceImpl implements StoreService {
@@ -50,6 +52,39 @@ public class StoreServiceImpl implements StoreService {
 
     @Autowired
     GoodCommentsRepository goodCommentsRepository;
+
+    public static Boolean checkPhone(String phone) {
+
+
+        if (null == phone || "".equalsIgnoreCase(phone)) {
+
+            return false;
+        } else {
+            if (phone.length() != 11) {
+                return false;
+            }
+            String regex = "^((13[0-9])|(14[5,7,9])|(15([0-3]|[5-9]))|(17[0,1,3,5,6,7,8])|(18[0-9])|(19[8|9])|(16[6]))\\d{8}$";
+            // String regex1 = "/0\\d{2,3}-\\d{7,8}/";座机
+            Pattern p = Pattern.compile(regex);
+            Matcher m = p.matcher(phone);
+            boolean isMatch = m.matches();
+            if (!isMatch) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static Boolean checkTime(String time) {
+
+
+        String regex = "([01][0-9]|2[0-3]):[0-5][0-9]";
+        // String regex1 = "/0\\d{2,3}-\\d{7,8}/";座机
+        Pattern p = Pattern.compile(regex);
+        Matcher m = p.matcher(time);
+        boolean isMatch = m.matches();
+        return isMatch;
+    }
 
 
     public JSONObject getDist() {
@@ -91,6 +126,10 @@ public class StoreServiceImpl implements StoreService {
             if(storeRepository.findByDistName(data.getString("truename")) != null && !data.getString("truename").equals(store.getDistName())){
                 return "{\"status\": \"用户名已被他人使用\"}";
             }
+            String dist_phone_nu = data.getString("dist_phone_nu");
+            if (!checkPhone(dist_phone_nu)) {
+                return "{\"status\": \"电话号码格式错误\"}";
+            }
 
             String location = data.getString("location");
             if (!location.isEmpty()) {
@@ -102,7 +141,7 @@ public class StoreServiceImpl implements StoreService {
                 store.setDistName(truename);
             }
 
-            String dist_phone_nu = data.getString("dist_phone_nu");
+
             if (!location.isEmpty()) {
                 store.setDistPhone(dist_phone_nu);
             }
@@ -202,6 +241,9 @@ public class StoreServiceImpl implements StoreService {
     public String changeMyStore(JSONObject data){
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Stores store = storeRepository.findByDistName(userDetails.getUsername());
+        if (!checkPhone(data.getString("phone_nu"))) {
+            return "{\"status\": \"电话号码格式错误\"}";
+        }
         if(!data.getString("name").isEmpty()){
             store.setStoreName(data.getString("name"));
         }
@@ -319,6 +361,10 @@ public class StoreServiceImpl implements StoreService {
 
     public String modifyGoods(JSONObject data){
         Goods good = goodsRepository.findByGoodId(data.getLong("good_id"));
+        Long coupon_price = data.getLong("coupon_price");
+        if(coupon_price<=0 || data.getLong("price")<0){
+            return "{\"status\": \"价格必须为正数\"}";
+        }
         if(!data.getString("description").isEmpty()) {
             good.setDescription(data.getString("description"));
         }
@@ -332,13 +378,16 @@ public class StoreServiceImpl implements StoreService {
         if( price != null) {
             good.setPrice(new BigDecimal(data.getLong("price")));
         }
-        Long coupon_price = data.getLong("coupon_price");
+
         if( coupon_price != null) {
             good.setDiscount(new BigDecimal(data.getLong("coupon_price")));
         }
         Long storage = data.getLong("storage");
-        if( coupon_price != null) {
-            good.setStorage(data.getLong("storage"));
+        if( storage != null) {
+            if(storage<0){
+                good.setStorage(new Long(0));
+            }
+            else{good.setStorage(data.getLong("storage"));}
         }
         Boolean hidden = data.getBoolean("hidden");
         if(hidden != null) {
@@ -352,9 +401,16 @@ public class StoreServiceImpl implements StoreService {
         try {
             UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             Stores store = storeRepository.findByDistName(userDetails.getUsername());
+            if(data.getLong("coupon_price")<0 || data.getLong("price")<0){
+                return "{\"status\": \"价格必须大于0\"}";
+            }
             Goods new_good = new Goods();
             new_good.setHidden(false);
-            new_good.setStorage(data.getLong("storage"));
+            if(data.getLong("storage")<0){
+                new_good.setStorage(new Long(0));
+            }else {
+                new_good.setStorage(data.getLong("storage"));
+            }
             new_good.setDiscount(new BigDecimal(data.getLong("coupon_price")));
             new_good.setPrice(new BigDecimal(data.getLong("price")));
             new_good.setGoodName(data.getString("name"));
