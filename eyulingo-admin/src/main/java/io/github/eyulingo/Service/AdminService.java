@@ -16,5 +16,11 @@ public interface AdminService {
 
     public String modifyDist(JSONObject data);
 
+    public JSONObject getStoreGood(String store_id);
+
+    public String addTag(JSONObject data);
+
+    public String deleteTag(JSONObject data);
+
 }
 

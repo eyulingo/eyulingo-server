@@ -1,19 +1,17 @@
 package io.github.eyulingo.Entity;
 
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
 @Entity
+@IdClass(OrderItemsPK.class)
 @Table(name = "orderitems")
 public class OrderItems implements Serializable {
     @Id
-    @Column(name = "store_id")
-    private Long storeId;
+    @Column(name = "order_id")
+    private Long orderId;
 
     @Id
     @Column(name = "good_id")
@@ -22,17 +20,18 @@ public class OrderItems implements Serializable {
     @Column(name = "current_price")
     private BigDecimal currentPrice;
 
+
     @Column(name = "amount")
     private Long amount;
 
     public OrderItems(){}
 
     public void setStoreId(Long storeId) {
-        this.storeId = storeId;
+        this.orderId = storeId;
     }
 
     public Long getStoreId() {
-        return storeId;
+        return orderId;
     }
 
     public void setAmount(Long amount) {
