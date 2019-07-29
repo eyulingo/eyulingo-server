@@ -1,12 +1,10 @@
 package io.github.eyulingo.Entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.sql.Timestamp;
 
 @Entity
+@IdClass(CheckCodesPK.class)
 @Table(name = "checkcodes")
 public class CheckCodes {
     @Id
@@ -19,6 +17,10 @@ public class CheckCodes {
     @Column(name = "time")
     private Timestamp time;
 
+    @Id
+    @Column(name = "type")
+    Long type;
+
     public CheckCodes(){
 
     }
@@ -27,7 +29,13 @@ public class CheckCodes {
         return checkCode;
     }
 
+    public Long getType() {
+        return type;
+    }
 
+    public void setType(Long type) {
+        this.type = type;
+    }
 
     public Timestamp getTime() {
         return time;

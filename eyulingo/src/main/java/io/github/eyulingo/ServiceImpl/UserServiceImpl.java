@@ -55,9 +55,10 @@ public class UserServiceImpl implements UserService {
         Date beforeDate = new Date(now.getTime()-180000);
         Timestamp getDate = new Timestamp(beforeDate.getTime());
         String email = data.getString("email");
+        Long type = data.getLong("type");
         JSONObject item = new JSONObject();
         Users usertest = userRepository.findByUserEmail(email);
-        List<CheckCodes> emalitset = checkCodeRepository.findByUserEmail(email);
+        List<CheckCodes> emalitset = checkCodeRepository.findByUserEmailAndType(email,type);
         CheckCodes newestCode = new CheckCodes();
         if(emalitset.size() !=0 ) {
             newestCode = emalitset.get(0);
@@ -94,6 +95,7 @@ public class UserServiceImpl implements UserService {
             checkCodes.setUserEmail(email);
             checkCodes.setCheckCode(code);
             checkCodes.setTime(nowdate);
+            checkCodes.setType(type);
             checkCodeRepository.save(checkCodes);
             System.out.printf(code);
             CodeSender vCS = new CodeSender();
@@ -153,7 +155,7 @@ public class UserServiceImpl implements UserService {
                 userRepository.save(newuser);
                 return "{\"status\": \"ok\"}";
             }
-            List<CheckCodes> LCode = checkCodeRepository.findByUserEmail(email);
+            List<CheckCodes> LCode = checkCodeRepository.findByUserEmailAndType(email,new Long(0));
             if (LCode.size() != 0) {
                 CheckCodes newestCode = LCode.get(0);
                 for (CheckCodes code : LCode) {
@@ -254,7 +256,7 @@ public class UserServiceImpl implements UserService {
         Timestamp registerdate = new Timestamp(date.getTime());
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Users currentUser = userRepository.findByUserName(userDetails.getUsername());
-        List<CheckCodes> LCode = checkCodeRepository.findByUserEmail(new_email);
+        List<CheckCodes> LCode = checkCodeRepository.findByUserEmailAndType(new_email,new Long(1));
         if (LCode.size() != 0) {
             CheckCodes newestCode = LCode.get(0);
             for (CheckCodes code : LCode) {
@@ -290,7 +292,7 @@ public class UserServiceImpl implements UserService {
             Date beforeDate = new Date(now.getTime()-180000);
             Timestamp getDate = new Timestamp(beforeDate.getTime());
             JSONObject item = new JSONObject();
-            List<CheckCodes> emalitset = checkCodeRepository.findByUserEmail(email);
+            List<CheckCodes> emalitset = checkCodeRepository.findByUserEmailAndType(email,new Long(2));
             CheckCodes newestCode = new CheckCodes();
             if(emalitset.size() !=0 ) {
                 newestCode = emalitset.get(0);
@@ -320,6 +322,7 @@ public class UserServiceImpl implements UserService {
                 }
                 newestCode.setCheckCode(code);
                 newestCode.setTime(nowdate);
+                newestCode.setType(new Long(2));
                 checkCodeRepository.save(newestCode);
                 System.out.printf(code);
                 CodeSender vCS = new CodeSender();
@@ -1325,5 +1328,13 @@ public class UserServiceImpl implements UserService {
         item.accumulate("status","ok");
         item.accumulate("tags",values);
         return item;
+    }
+
+    public String confirmOrder(JSONObject data){
+        Long id = data.getLong("order_id");
+        Orders orders = orderRepository.findByOrderId(id);
+        orders.setStatus("received");
+        orderRepository.save(orders);
+        return "{\"status\": \"ok\"}";
     }
 }
