@@ -1017,6 +1017,8 @@ public class UserServiceImpl implements UserService {
             item.accumulate("order_status",order.getStatus());
             item.accumulate("generate_time",order.getOrderTime().toString());
             item.accumulate("rated",order.getRated());
+            item.accumulate("longitude",storeRepository.findByStoreId(order.getStoreId()).getLongitude());
+            item.accumulate("latitude",storeRepository.findByStoreId(order.getStoreId()).getLatitude());
             if(order.getRated()){
                 item.accumulate("star_count",order.getRateLevel());
                 item.accumulate("comment_content",order.getCommentContent());
