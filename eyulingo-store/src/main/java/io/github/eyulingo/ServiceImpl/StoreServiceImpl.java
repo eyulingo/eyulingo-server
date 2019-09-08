@@ -17,10 +17,7 @@ import java.sql.Timestamp;
 import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -540,7 +537,7 @@ public class StoreServiceImpl implements StoreService {
         return item;
     }
 
-    public JSONObject getSelectOrder(String startTime,String endTime,String username) {
+    public JSONObject getSelectOrder(String startTime,String endTime) {
         Format f = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         Timestamp sTime = new Timestamp(new Date().getTime());
         Timestamp eTime = new Timestamp(new Date().getTime());
@@ -566,43 +563,32 @@ public class StoreServiceImpl implements StoreService {
         Stores store = storeRepository.findByDistName(userDetails.getUsername());
         List<Orders> ordersList = orderRepository.findByStoreId(store.getStoreId());
         JSONObject result = new JSONObject();
-        JSONArray values = new JSONArray();
+        Map<String,Long> goods = new HashMap<String,Long>();
         for(Orders order:ordersList){
             if ((startTime.equals("") || sTime.compareTo(order.getOrderTime())<=0)
-                    && (endTime.equals("")||eTime.compareTo(order.getOrderTime())>=0)
-                    && (username.equals("")||userRepository.findByUserId(order.getUserId()).getUserName().equals(username))){
+                    && (endTime.equals("")||eTime.compareTo(order.getOrderTime())>=0)){
                 JSONObject item = new JSONObject();
-                item.accumulate("user_id", order.getUserId());
-                item.accumulate("username", userRepository.findByUserId(order.getUserId()).getUserName());
-                item.accumulate("bill_id", order.getOrderId());
-                item.accumulate("receiver", order.getReceiver());
-                item.accumulate("receiver_phone", order.getRePhone());
-                item.accumulate("receiver_address", order.getReAddress());
-                item.accumulate("transport_method", order.getDeliverMethod());
-                item.accumulate("order_status", order.getStatus());
-                item.accumulate("time",order.getOrderTime().toString());
                 List<OrderItems> orderItemsList = orderitemsRepository.findByOrderId(order.getOrderId());
-                JSONArray goodsList = new JSONArray();
                 for (OrderItems orderItem : orderItemsList) {
                     Goods good = goodsRepository.findByGoodId(orderItem.getGoodId());
-                    JSONObject goodDetail = new JSONObject();
-                    goodDetail.accumulate("id", orderItem.getGoodId());
-                    goodDetail.accumulate("name", good.getGoodName());
-                    goodDetail.accumulate("store", store.getStoreName());
-                    goodDetail.accumulate("store_id", store.getStoreId());
-                    goodDetail.accumulate("current_price", orderItem.getCurrentPrice());
-                    goodDetail.accumulate("amount", orderItem.getAmount());
-                    goodDetail.accumulate("description", good.getDescription());
-                    goodDetail.accumulate("image_id", good.getGoodImageId());
-                    goodsList.add(goodDetail);
+                    if(goods.containsKey(good.getGoodName())){
+                        Long num = goods.get(good.getGoodName())+orderItem.getAmount();
+                        goods.put(good.getGoodName(),num);
+                    }
+                    else{
+                        goods.put(good.getGoodName(),orderItem.getAmount());
+                    }
+
                 }
-                item.accumulate("goods", goodsList);
-                values.add(item);
+
             }
         }
-        values.sort(Comparator.comparing(obj -> ((JSONObject) obj).getString("time")).reversed());
+        Map<String,Long> goods2 = new HashMap<String,Long>();
+        goods.entrySet().stream()
+                .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+                .forEachOrdered(e -> goods2.put(e.getKey(), e.getValue()));
         result.accumulate("status","ok");
-        result.accumulate("values",values);
+        result.accumulate("values",goods2);
         return result;
     }
 }

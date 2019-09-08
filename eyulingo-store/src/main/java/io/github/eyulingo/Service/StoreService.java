@@ -40,5 +40,5 @@ public interface StoreService {
 
     public JSONObject goodComments(Long id);
 
-    public JSONObject getSelectOrder(String startTime,String endTime,String username);
+    public JSONObject getSelectOrder(String startTime,String endTime);
 }
