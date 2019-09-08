@@ -19,6 +19,6 @@ public class StoreSelectOrderController {
     public
     @ResponseBody
     JSONObject storeSelect(HttpServletRequest httpServletRequest){
-        return this.storeService.getSelectOrder(httpServletRequest.getParameter("startTime"),httpServletRequest.getParameter("endTime"),httpServletRequest.getParameter("username"));
+        return this.storeService.getSelectOrder(httpServletRequest.getParameter("startTime"),httpServletRequest.getParameter("endTime"));
     }
 }
