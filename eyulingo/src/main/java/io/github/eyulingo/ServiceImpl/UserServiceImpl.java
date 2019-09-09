@@ -387,7 +387,7 @@ public class UserServiceImpl implements UserService {
         }
         else {
             String email = missUser.getUserEmail();
-            List<CheckCodes> LCode = checkCodeRepository.findByUserEmail(email);
+            List<CheckCodes> LCode = checkCodeRepository.findByUserEmailAndType(email,new Long(2));
             if (LCode.size() != 0) {
                 CheckCodes newestCode = LCode.get(0);
                 for (CheckCodes code : LCode) {
