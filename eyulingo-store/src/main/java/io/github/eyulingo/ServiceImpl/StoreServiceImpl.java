@@ -238,9 +238,6 @@ public class StoreServiceImpl implements StoreService {
     public String changeMyStore(JSONObject data){
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Stores store = storeRepository.findByDistName(userDetails.getUsername());
-        if (!checkPhone(data.getString("phone_nu"))) {
-            return "{\"status\": \"电话号码格式错误\"}";
-        }
         if(!data.getString("name").isEmpty()){
             store.setStoreName(data.getString("name"));
         }
