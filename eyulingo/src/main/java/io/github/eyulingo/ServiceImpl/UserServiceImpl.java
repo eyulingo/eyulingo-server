@@ -294,7 +294,7 @@ public class UserServiceImpl implements UserService {
             JSONObject item = new JSONObject();
             List<CheckCodes> emalitset = checkCodeRepository.findByUserEmailAndType(email,new Long(2));
             CheckCodes newestCode = new CheckCodes();
-            if(emalitset.size() !=0 ) {
+            if(emalitset.size() != 0 ) {
                 newestCode = emalitset.get(0);
                 for (CheckCodes code : emalitset) {
                     if (code.getTime().compareTo(newestCode.getTime()) <= 0) {
@@ -302,15 +302,40 @@ public class UserServiceImpl implements UserService {
                     }
                 }
             }
-            Timestamp lastGetTime = newestCode.getTime();
-            if(!email.matches("\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*"))
-            {
-                item.accumulate("status","邮箱格式错误");
-                return item;
-            }
-            else if(lastGetTime.compareTo(getDate) >= 0){
-                item.accumulate("status","两次验证码获取需间隔三分钟");
-                return item;
+            System.out.printf(newestCode.toString());
+            if(emalitset.size() != 0){
+                Timestamp lastGetTime = newestCode.getTime();
+                System.out.printf(lastGetTime.toString());
+                if(lastGetTime.compareTo(getDate) >= 0){
+                    item.accumulate("status","两次验证码获取需间隔三分钟");
+                    return item;
+                }
+                else {
+                    Date date = new Date();
+                    Timestamp nowdate = new Timestamp(date.getTime());
+                    String chars = "0123456789";
+                    String code = new String();
+                    for (int i = 0; i < 6; i++) {
+                        code = chars.charAt((int) (Math.random() * 10)) + code;
+                    }
+                    newestCode.setCheckCode(code);
+                    newestCode.setTime(nowdate);
+                    newestCode.setType(new Long(2));
+                    checkCodeRepository.save(newestCode);
+                    System.out.printf(code);
+                    CodeSender vCS = new CodeSender();
+
+                    try {
+                        vCS.sendCode(email, code);
+//                item.accumulate("code", code);
+                        item.accumulate("status", "ok");
+                        return item;
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        item.accumulate("status", "发送失败");
+                        return item;
+                    }
+                }
             }
             else {
                 Date date = new Date();
@@ -320,6 +345,7 @@ public class UserServiceImpl implements UserService {
                 for (int i = 0; i < 6; i++) {
                     code = chars.charAt((int) (Math.random() * 10)) + code;
                 }
+                newestCode.setUserEmail(missUser.getUserEmail());
                 newestCode.setCheckCode(code);
                 newestCode.setTime(nowdate);
                 newestCode.setType(new Long(2));
@@ -330,7 +356,7 @@ public class UserServiceImpl implements UserService {
                 try {
                     vCS.sendCode(email, code);
 //                item.accumulate("code", code);
-                    item.accumulate("status","ok");
+                    item.accumulate("status", "ok");
                     return item;
                 } catch (Exception ex) {
                     ex.printStackTrace();
